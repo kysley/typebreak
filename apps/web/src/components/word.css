@@ -9,3 +9,7 @@
 .letter.correct {
   color: green;
 }
+
+.letter.extra {
+  color: orange;
+}

@@ -1,13 +1,13 @@
 import { useRecoilValue } from "recoil";
-import { indexAtom, wordsState } from "../state";
+import { indexAtom, inputAtIndex, wordsState } from "../state";
 import "./word.css";
 
 type WordProps = {
   myIndex: number;
-  input: string;
 };
-export function Word({ myIndex, input = "" }: WordProps) {
+export function Word({ myIndex }: WordProps) {
   const word = useRecoilValue(wordsState(myIndex));
+  const input = useRecoilValue(inputAtIndex(myIndex));
   const indexState = useRecoilValue(indexAtom);
 
   const show = myIndex <= indexState;
@@ -28,6 +28,20 @@ export function Word({ myIndex, input = "" }: WordProps) {
           </span>
         );
       })}
+      {input.length > word.name.length && (
+        <>
+          {input
+            .substring(word.name.length)
+            .split("")
+            .map((letter, idx) => {
+              return (
+                <span className={`letter extra`} key={`${letter}-${idx}`}>
+                  {letter}
+                </span>
+              );
+            })}
+        </>
+      )}
     </span>
   );
 }
