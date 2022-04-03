@@ -100,6 +100,11 @@ export const inputAtom = atom<string[]>({
   default: [""],
 });
 
+export const inputAsString = selector({
+  key: "inputAtom/string",
+  get: ({ get }) => get(inputAtom).join(" "),
+});
+
 export const inputAtIndex = selectorFamily({
   key: "inputAtom/index",
   get:
@@ -116,16 +121,9 @@ export const indexAtom = atom({
 export const currentLetter = selector({
   key: "indexAtom/letter",
   get: ({ get }) => {
-    const word = get(wordsAtom);
     const idx = get(indexAtom);
-    const expected = word[idx];
     const got = get(inputAtIndex(idx));
 
     return got.length;
-    let inputLength = get(inputAtom)[get(indexAtom)].length + 1;
-    // if (inputLength === 0) inputLength = 1;
-    // else inputLength += 1;
-
-    return inputLength;
   },
 });

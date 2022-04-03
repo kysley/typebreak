@@ -4,11 +4,11 @@ import "./word.css";
 
 type WordProps = {
   myIndex: number;
+  indexState: number;
 };
-export function Word({ myIndex }: WordProps) {
+export function Word({ myIndex, indexState }: WordProps) {
   const word = useRecoilValue(wordsState(myIndex));
   const input = useRecoilValue(inputAtIndex(myIndex));
-  const indexState = useRecoilValue(indexAtom);
 
   const show = myIndex <= indexState;
 

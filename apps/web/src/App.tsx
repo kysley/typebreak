@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useSpring, animated } from "react-spring";
 import "./App.css";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -8,6 +8,7 @@ import {
   currentLetter,
   wordsAtom,
   wordsState,
+  inputAsString,
 } from "./state";
 import { Word } from "./components/word";
 
@@ -19,21 +20,15 @@ function App() {
   const wordsRef = useRef<HTMLDivElement>(null);
   const curLetter = useRecoilValue(currentLetter);
   const [caretPos, setCaretPos] = useSpring(() => ({
-    marginLeft: 0,
-    top: 5,
+    transform: "translate(0,0)",
     config: { duration: 55, friction: 5, precision: 1 },
   }));
 
   const [breaks, setBreaks] = useState<number[]>([]);
+  const [eol, setEol] = useState(false);
 
   const handleFocus = () => {
     inputRef.current?.focus();
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const wordHistory = e.target.value.split(" ");
-    setInput(wordHistory);
-    setIndex(wordHistory.length - 1);
   };
 
   const horizontalSpaceBetweenWords = useMemo(
@@ -55,14 +50,15 @@ function App() {
     const lineBreakIndixes: number[] = [];
     let prevTop = 0;
     words.forEach((word, idx) => {
+      // skip words that are before the current index
+      // this saves expensive calls to getBoundingClientRect()
+      if (idx < index) return;
       const top = word.getBoundingClientRect().top;
       if (prevTop !== top) {
         lineBreakIndixes.push(idx);
       }
       prevTop = top;
     });
-
-    console.log(lineBreakIndixes);
 
     setBreaks(lineBreakIndixes);
   }, [index]);
@@ -71,41 +67,66 @@ function App() {
     if (!wordsRef.current) return;
 
     const wordsDom = Array.from(wordsRef.current.children);
+    const containerBounding = wordsRef.current.getBoundingClientRect();
 
     const thisWord = wordsDom[index];
 
     const letters = Array.from(thisWord.children);
 
-    let horiz: number;
+    let dir: "left" | "right";
     let letter;
     if (curLetter >= words[index].length) {
       letter = letters[curLetter - 1];
 
-      horiz = letter.getBoundingClientRect().right;
+      dir = "right";
     } else {
       letter = letters[curLetter];
 
-      horiz = letter.getBoundingClientRect().left;
+      dir = "left";
     }
+    const letterBounding = letter.getBoundingClientRect();
+    const isEol =
+      letterBounding["right"] + horizontalSpaceBetweenWords * 2 >
+      containerBounding.right;
+
+    console.log({
+      cb: containerBounding.right,
+      lb: letterBounding.right,
+      isEol,
+    });
+    // don't bother setting false to false
+    setEol(isEol);
+
     setCaretPos({
-      marginLeft: horiz,
-      marginTop: letter.getBoundingClientRect().top,
+      transform: `translate(${letterBounding[dir]}px, ${
+        letterBounding.bottom - letterBounding.height
+      }px)`,
     });
   }, [curLetter, index, wordsRef, words]);
 
+  // const rowsHidden = breaks.findIndex((breakIndex) => breakIndex < index);
+  // console.log(rowsHidden);
+
   return (
     <div className="App">
-      <input className="input-hidden" ref={inputRef} onChange={handleChange} />
+      <UnderlyingInput
+        ref={inputRef}
+        eol={eol}
+        setEol={(v) => setEol(v)}
+        curLetter={curLetter}
+      />
       <div onClick={handleFocus} ref={wordsRef} id="dev">
         {words.map((word, idx) => (
-          <Word myIndex={idx} key={`${word}-${idx}}`} />
+          <Word myIndex={idx} key={`${word}-${idx}}`} indexState={index} />
         ))}
       </div>
       <animated.div
         style={{
           ...caretPos,
-          width: "4px",
-          height: "25px",
+          left: 0,
+          top: 5,
+          width: "3px",
+          height: "1.5rem",
           position: "absolute",
           background: "pink",
         }}
@@ -113,6 +134,46 @@ function App() {
     </div>
   );
 }
+
+const UnderlyingInput = forwardRef(
+  (
+    {
+      curLetter,
+      eol,
+      setEol,
+    }: { curLetter: number; eol: boolean; setEol(v: boolean): void },
+    ref: any
+  ) => {
+    const setInput = useSetRecoilState(inputAtom);
+    const setIndex = useSetRecoilState(indexAtom);
+    const value = useRecoilValue(inputAsString);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      // this can be optimized
+      const wordHistory = e.target.value.split(" ");
+      if (wordHistory[wordHistory.length - 1].length <= curLetter) {
+        console.log("backspace");
+        setEol(false);
+      } else if (eol) {
+        console.log("eol");
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
+      setInput(wordHistory);
+      setIndex(wordHistory.length - 1);
+    };
+
+    return (
+      <input
+        className="input-hidden"
+        ref={ref}
+        onChange={handleChange}
+        value={value}
+      />
+    );
+  }
+);
 
 function Caret() {}
 
