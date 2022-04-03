@@ -20,7 +20,8 @@ code {
 
 #dev {
   display: flex;
-  gap: .25rem;
+  gap: .5rem;
   width: 50%;
   flex-wrap: wrap;
+  background: #00000015;
 }
