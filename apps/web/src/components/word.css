@@ -3,6 +3,10 @@
   font-size: 1.5rem;
   line-height: 1.5rem;
 }
+.word.hidden {
+  /* color: gray !important; */
+  display: none;
+}
 
 .letter.incorrect {
   color: red;

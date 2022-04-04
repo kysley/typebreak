@@ -31,8 +31,9 @@ function App() {
     config: { duration: 55, friction: 5, precision: 1 },
   }));
 
-  const [breaks, setBreaks] = useState<number[]>([]);
+  const [breakAt, setBreak] = useState<number>();
   const [breakIndex, setbreakIndex] = useState<number>(0);
+  const [lastBreakIndex, setLastBreakIndex] = useState<number>(0);
   const [timesBroke, setTimesBroke] = useState(0);
   const [eol, setEol] = useState(false);
 
@@ -43,50 +44,49 @@ function App() {
   const horizontalSpaceBetweenWords = useMemo(
     () =>
       Math.abs(
-        (wordsRef?.current?.children[breaks[0]]?.getBoundingClientRect()
-          .right || 30) -
-          (wordsRef?.current?.children[breaks[0] + 1]?.getBoundingClientRect()
-            .left || 20),
+        (wordsRef?.current?.children[0]?.getBoundingClientRect().right || 30) -
+          (wordsRef?.current?.children[1]?.getBoundingClientRect().left || 20),
       ),
-    [breaks],
+    [],
   );
 
   useEffect(() => {
-    if (index >= breaks[0]) {
-      console.log('line break');
-      setbreakIndex(breaks[0]);
-      setTimesBroke((prev) => (prev += 1));
+    if (breakAt) {
+      if (index >= breakAt) {
+        // const difference = breakAt - index;
+        console.log({ index, breakAt });
+        setLastBreakIndex(breakIndex);
+        setbreakIndex(breakAt);
+        setTimesBroke((prev) => (prev += 1));
+      }
     }
-  }, [breaks, index, setbreakIndex]);
+  }, [breakAt, breakIndex, index, setbreakIndex]);
 
   useLayoutEffect(() => {
     if (!wordsRef.current) return;
 
     const words = Array.from(wordsRef.current.children);
 
-    const lineBreakIndixes: number[] = [];
-    let prevTop = 0;
-    for (let idx = 0; idx <= words.length - 1; idx++) {
+    let nextLineBreak: number | null = null;
+    let prevTop = null;
+    for (let idx = index; idx <= words.length - 1; idx++) {
       const word = words[idx];
 
-      if (idx < index) return;
+      // if (idx < index) return;
       const top = word.getBoundingClientRect().top;
-      if (prevTop === 0) {
+      if (prevTop === null) {
         prevTop = top;
       }
       if (prevTop !== top) {
-        lineBreakIndixes.push(idx);
+        console.log({ prevTop, top, idx });
+
+        nextLineBreak = idx;
         break;
       }
       prevTop = top;
     }
-    // words.forEach((word, idx) => {
-    //   // skip words that are before the current index
-    //   // this saves expensive calls to getBoundingClientRect()
 
-    // });
-    // lineBreakIndixes.shift();
-    setBreaks(lineBreakIndixes);
+    if (nextLineBreak) setBreak(nextLineBreak);
   }, [index]);
 
   useLayoutEffect(() => {
@@ -101,37 +101,46 @@ function App() {
 
     let dir: 'left' | 'right';
     let letter;
+    let isExtraLetter = false;
     if (curLetter >= words[index].length) {
       letter = letters[curLetter - 1];
-
       dir = 'right';
+      isExtraLetter = true;
     } else {
       letter = letters[curLetter];
-
       dir = 'left';
     }
     const letterBounding = letter.getBoundingClientRect();
     const isEol =
+      isExtraLetter &&
       letterBounding['right'] + horizontalSpaceBetweenWords * 2 >
-      containerBounding.right;
+        containerBounding.right;
 
-    // console.log({
-    //   cb: containerBounding.right,
-    //   lb: letterBounding.right,
-    //   isEol,
-    // });
-    // don't bother setting false to false
     setEol(isEol);
 
-    setCaretPos({
-      transform: `translate(${letterBounding[dir]}px, ${
-        letterBounding.bottom - letterBounding.height
-      }px)`,
-    });
-  }, [curLetter, index, wordsRef, words]);
-
-  // const rowsHidden = breaks.findIndex((breakIndex) => breakIndex < index);
-  // console.log(rowsHidden);
+    if (index === breakAt) {
+      const top = wordsDom[breakAt].children[0].getBoundingClientRect().top;
+      setCaretPos({
+        transform: `translate(${letterBounding[dir]}px, ${
+          letterBounding.bottom - top
+        }px)`,
+      });
+    } else {
+      setCaretPos({
+        transform: `translate(${letterBounding[dir]}px, ${
+          letterBounding.bottom - letterBounding.height
+        }px)`,
+      });
+    }
+  }, [
+    curLetter,
+    index,
+    wordsRef,
+    words,
+    breakAt,
+    horizontalSpaceBetweenWords,
+    setCaretPos,
+  ]);
 
   return (
     <div className='App'>
@@ -143,7 +152,12 @@ function App() {
       />
       <div onClick={handleFocus} ref={wordsRef} id='dev'>
         {words.map((word, idx) => (
-          <Word myIndex={idx} key={`${word}-${idx}}`} indexState={index} />
+          <Word
+            myIndex={idx}
+            key={`${word}-${idx}}`}
+            indexState={index}
+            hidden={timesBroke > 1 && lastBreakIndex > idx}
+          />
         ))}
       </div>
       <animated.div
