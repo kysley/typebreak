@@ -1,4 +1,4 @@
-import {
+import React, {
   forwardRef,
   useEffect,
   useLayoutEffect,
@@ -11,18 +11,15 @@ import './App.css';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   indexAtom,
-  inputAtom,
   currentLetter,
   wordsAtom,
-  wordsState,
-  inputAsString,
+  inputAtCurrentIndex,
 } from './state';
 import { Word } from './components/word';
 
 function App() {
   const words = useRecoilValue(wordsAtom);
-  const setInput = useSetRecoilState(inputAtom);
-  const [index, setIndex] = useRecoilState(indexAtom);
+  const index = useRecoilValue(indexAtom);
   const inputRef = useRef<HTMLInputElement>(null);
   const wordsRef = useRef<HTMLDivElement>(null);
   const curLetter = useRecoilValue(currentLetter);
@@ -53,7 +50,6 @@ function App() {
   useEffect(() => {
     if (breakAt) {
       if (index >= breakAt) {
-        // const difference = breakAt - index;
         console.log({ index, breakAt });
         setLastBreakIndex(breakIndex);
         setbreakIndex(breakAt);
@@ -62,9 +58,9 @@ function App() {
     }
   }, [breakAt, breakIndex, index, setbreakIndex]);
 
+  // handle line break
   useLayoutEffect(() => {
     if (!wordsRef.current) return;
-
     const words = Array.from(wordsRef.current.children);
 
     let nextLineBreak: number | null = null;
@@ -89,7 +85,9 @@ function App() {
     if (nextLineBreak) setBreak(nextLineBreak);
   }, [index]);
 
+  // Handle the caret position
   useLayoutEffect(() => {
+    console.log('caret effect');
     if (!wordsRef.current) return;
 
     const wordsDom = Array.from(wordsRef.current.children);
@@ -118,28 +116,27 @@ function App() {
 
     setEol(isEol);
 
-    if (index === breakAt) {
-      const top = wordsDom[breakAt].children[0].getBoundingClientRect().top;
-      setCaretPos({
-        transform: `translate(${letterBounding[dir]}px, ${
-          letterBounding.bottom - top
-        }px)`,
-      });
-    } else {
-      setCaretPos({
-        transform: `translate(${letterBounding[dir]}px, ${
-          letterBounding.bottom - letterBounding.height
-        }px)`,
-      });
-    }
+    // if (index === breakAt) {
+    //   const top = wordsDom[breakAt].children[0].getBoundingClientRect().top;
+    //   setCaretPos({
+    //     transform: `translate(${letterBounding[dir]}px, ${
+    //       letterBounding.bottom - top
+    //     }px)`,
+    //   });
+    // } else {
+    setCaretPos({
+      transform: `translate(${letterBounding[dir]}px, ${
+        letterBounding.bottom - letterBounding.height
+      }px)`,
+    });
+    // }
   }, [
     curLetter,
     index,
-    wordsRef,
-    words,
     breakAt,
     horizontalSpaceBetweenWords,
     setCaretPos,
+    words,
   ]);
 
   return (
@@ -184,32 +181,65 @@ const UnderlyingInput = forwardRef(
     }: { curLetter: number; eol: boolean; setEol(v: boolean): void },
     ref: any,
   ) => {
-    const setInput = useSetRecoilState(inputAtom);
     const setIndex = useSetRecoilState(indexAtom);
-    const value = useRecoilValue(inputAsString);
+    const [value, setValue] = useRecoilState(inputAtCurrentIndex);
+    const selectedAllRef = useRef(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // this can be optimized
-      const wordHistory = e.target.value.split(' ');
-      if (wordHistory[wordHistory.length - 1].length <= curLetter) {
-        console.log('backspace');
-        setEol(false);
-      } else if (eol) {
-        console.log('eol');
-        e.stopPropagation();
-        e.preventDefault();
-        return;
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      const ctrl = e.ctrlKey || e.metaKey;
+
+      if (e.key.length === 1 && e.key !== ' ' && !ctrl && !eol) {
+        if (selectedAllRef.current) {
+          console.log('all selected, replacing with next key');
+          setValue(e.key);
+        } else {
+          setValue((prev) => (prev += e.key));
+        }
       }
-      setInput(wordHistory);
-      setIndex(wordHistory.length - 1);
+
+      if (ctrl) {
+        if (e.key === 'Backspace') {
+          console.log('ctrl + backspace');
+          setValue('');
+          return;
+        }
+        if (e.key === 'a') {
+          console.log('ctrl + a');
+          selectedAllRef.current = true;
+          return;
+        }
+      }
+
+      if (e.key === 'Backspace') {
+        setEol(false);
+        if (value.length === 0) {
+          console.log('backspacing through word');
+          setIndex((prev) => (prev === 0 ? 0 : (prev -= 1)));
+        }
+        if (selectedAllRef.current) {
+          console.log('backspacing all');
+          setValue('');
+        } else {
+          console.log('backspacing normal');
+          setValue((prev) => prev.substring(0, prev.length - 1));
+        }
+      } else if (e.key === ' ') {
+        setEol(false);
+        console.log('space');
+        setIndex((prev) => (prev += 1));
+        setValue('');
+      }
+
+      selectedAllRef.current = false;
     };
 
     return (
       <input
         className='input-hidden'
         ref={ref}
-        onChange={handleChange}
+        onKeyDown={handleKeyDown}
         value={value}
+        readOnly
       />
     );
   },

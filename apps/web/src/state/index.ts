@@ -80,17 +80,26 @@ export const inputAtom = atom<string[]>({
   default: [''],
 });
 
-export const inputAsString = selector({
-  key: 'inputAtom/string',
-  get: ({ get }) => get(inputAtom).join(' '),
-});
-
 export const inputAtIndex = selectorFamily({
   key: 'inputAtom/index',
   get:
     (index: number) =>
     ({ get }) =>
       get(inputAtom)[index] || '',
+});
+
+export const inputAtCurrentIndex = selector<string>({
+  key: 'inputAtom/cI',
+  get: ({ get }) => {
+    return get(inputAtom)[get(indexAtom)];
+  },
+  set: ({ get, set }, value) => {
+    const idx = get(indexAtom);
+    const abc = get(inputAtom);
+    const cpy = [...abc];
+    cpy[idx] = value;
+    set(inputAtom, cpy);
+  },
 });
 
 export const indexAtom = atom({
