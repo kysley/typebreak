@@ -1,6 +1,6 @@
-import { useRecoilValue } from "recoil";
-import { indexAtom, inputAtIndex, wordsState } from "../state";
-import "./word.css";
+import { useRecoilValue } from 'recoil';
+import { indexAtom, inputAtIndex, wordsState } from '../state';
+import './word.css';
 
 type WordProps = {
   myIndex: number;
@@ -13,15 +13,15 @@ export function Word({ myIndex, indexState }: WordProps) {
   const show = myIndex <= indexState;
 
   return (
-    <span className="word">
-      {word.name.split("").map((letter, idx) => {
+    <span className='word'>
+      {word.name.split('').map((letter, idx) => {
         const notYetTyped = input.length - 1 >= idx;
         const letterClass =
           show && notYetTyped
             ? input[idx] === letter
-              ? "correct"
-              : "incorrect"
-            : "";
+              ? 'correct'
+              : 'incorrect'
+            : '';
         return (
           <span className={`letter ${letterClass}`} key={`${letter}-${idx}`}>
             {letter}
@@ -32,7 +32,7 @@ export function Word({ myIndex, indexState }: WordProps) {
         <>
           {input
             .substring(word.name.length)
-            .split("")
+            .split('')
             .map((letter, idx) => {
               return (
                 <span className={`letter extra`} key={`${letter}-${idx}`}>
