@@ -173,14 +173,7 @@ function App() {
 }
 
 const UnderlyingInput = forwardRef(
-  (
-    {
-      curLetter,
-      eol,
-      setEol,
-    }: { curLetter: number; eol: boolean; setEol(v: boolean): void },
-    ref: any,
-  ) => {
+  ({ eol, setEol }: { eol: boolean; setEol(v: boolean): void }, ref: any) => {
     const setIndex = useSetRecoilState(indexAtom);
     const [value, setValue] = useRecoilState(inputAtCurrentIndex);
     const selectedAllRef = useRef(false);
