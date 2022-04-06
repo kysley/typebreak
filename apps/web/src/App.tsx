@@ -116,20 +116,11 @@ function App() {
 
     setEol(isEol);
 
-    // if (index === breakAt) {
-    //   const top = wordsDom[breakAt].children[0].getBoundingClientRect().top;
-    //   setCaretPos({
-    //     transform: `translate(${letterBounding[dir]}px, ${
-    //       letterBounding.bottom - top
-    //     }px)`,
-    //   });
-    // } else {
     setCaretPos({
       transform: `translate(${letterBounding[dir]}px, ${
         letterBounding.bottom - letterBounding.height
       }px)`,
     });
-    // }
   }, [
     curLetter,
     index,
@@ -141,17 +132,12 @@ function App() {
 
   return (
     <div className='App'>
-      <UnderlyingInput
-        ref={inputRef}
-        eol={eol}
-        setEol={(v) => setEol(v)}
-        curLetter={curLetter}
-      />
+      <UnderlyingInput ref={inputRef} eol={eol} setEol={(v) => setEol(v)} />
       <div onClick={handleFocus} ref={wordsRef} id='dev'>
         {words.map((word, idx) => (
           <Word
             myIndex={idx}
-            key={`${word}-${idx}}`}
+            key={`${word}-${idx}`}
             indexState={index}
             hidden={timesBroke > 1 && lastBreakIndex > idx}
           />
@@ -177,6 +163,8 @@ const UnderlyingInput = forwardRef(
     const setIndex = useSetRecoilState(indexAtom);
     const [value, setValue] = useRecoilState(inputAtCurrentIndex);
     const selectedAllRef = useRef(false);
+
+    const hasBackspacedCurrentWord = useRef(false);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       const ctrl = e.ctrlKey || e.metaKey;

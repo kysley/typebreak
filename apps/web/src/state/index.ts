@@ -53,6 +53,56 @@ export const wordsAtom = atom({
     'should',
     'write',
     'lead',
+    'own',
+    'tell',
+    'new',
+    'would',
+    'face',
+    'right',
+    'need',
+    'hold',
+    'under',
+    'number',
+    'now',
+    'say',
+    'not',
+    'house',
+    'consider',
+    'by',
+    'some',
+    'show',
+    'now',
+    'and',
+    'that',
+    'line',
+    'do',
+    'but',
+    'life',
+    'only',
+    'present',
+    'tell',
+    'to',
+    'have',
+    'turn',
+    'run',
+    'back',
+    'help',
+    'would',
+    'old',
+    'over',
+    'much',
+    'he',
+    'these',
+    'number',
+    'while',
+    'they',
+    'old',
+    'it',
+    'a',
+    'want',
+    'should',
+    'write',
+    'lead',
   ],
 });
 
@@ -66,12 +116,19 @@ export const wordsState = atomFamily({
         const word = get(wordsAtom)[param];
         return {
           name: word,
-          done: false,
-          perfect: false,
-          hidden: false,
+          perfect: false, // completed without mistakes, allowing backspaces
+          flawless: false, // completed without mistakes , no backspaces
         };
       },
   }),
+});
+
+export const wordsStateAtCurrentIndex = selector({
+  key: 'wordsState/currentIndex',
+  get: ({ get }) => {
+    const currentIndex = get(indexAtom);
+    return get(wordsState(currentIndex));
+  },
 });
 
 // this could become atomfamily to keep input per word
@@ -110,9 +167,6 @@ export const indexAtom = atom({
 export const currentLetter = selector({
   key: 'indexAtom/letter',
   get: ({ get }) => {
-    const idx = get(indexAtom);
-    const got = get(inputAtIndex(idx));
-
-    return got.length;
+    return get(inputAtCurrentIndex).length;
   },
 });
