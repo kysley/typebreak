@@ -106,6 +106,11 @@ export const wordsAtom = atom({
   ],
 });
 
+export type WordState = {
+  name: string;
+  perfect: boolean;
+  flawless: boolean;
+};
 export const wordsState = atomFamily({
   key: 'wordsState',
   default: selectorFamily({
@@ -123,12 +128,16 @@ export const wordsState = atomFamily({
   }),
 });
 
-export const wordsStateAtCurrentIndex = selector({
+export const wordsStateAtCurrentIndex = selector<WordState>({
   key: 'wordsState/currentIndex',
   get: ({ get }) => {
     const currentIndex = get(indexAtom);
     return get(wordsState(currentIndex));
   },
+  set:
+    ({ get, set }) =>
+    (newValue: WordState) =>
+      set(wordsState(get(indexAtom)), newValue),
 });
 
 // this could become atomfamily to keep input per word
@@ -169,4 +178,15 @@ export const currentLetter = selector({
   get: ({ get }) => {
     return get(inputAtCurrentIndex).length;
   },
+});
+
+export const timerType = atom<'INCREMENTAL' | 'DECREMENTAL'>({
+  key: 'timertype',
+  default: 'INCREMENTAL',
+});
+
+export type TypingState = 'IDLE' | 'STARTED' | 'DONE';
+export const typingState = atom<TypingState>({
+  key: 'typingstate',
+  default: 'IDLE',
 });

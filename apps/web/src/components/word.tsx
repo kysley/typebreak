@@ -1,5 +1,6 @@
 import { useRecoilValue } from 'recoil';
-import { indexAtom, inputAtIndex, wordsState } from '../state';
+import clsx from 'clsx';
+import { inputAtIndex, wordsState } from '../state';
 import './word.css';
 
 type WordProps = {
@@ -14,18 +15,28 @@ export function Word({ myIndex, indexState, hidden }: WordProps) {
   const show = myIndex <= indexState;
   const inputLength = input.length - 1;
 
+  const wordClasses = clsx({
+    word: true,
+    hidden: hidden,
+    flawless: word.flawless,
+    perfect: !word.flawless && word.perfect,
+    incorrect: !word.perfect,
+  });
+
   return (
-    <span className={`word ${hidden && 'hidden'}`}>
+    <span className={wordClasses}>
       {word.name.split('').map((letter, idx) => {
         const notYetTyped = inputLength >= idx;
-        const letterClass =
-          show && notYetTyped
-            ? input[idx] === letter
-              ? 'correct'
-              : 'incorrect'
-            : 'upcoming';
         return (
-          <span className={`letter ${letterClass}`} key={`${letter}-${idx}`}>
+          <span
+            key={`${letter}-${idx}`}
+            className={clsx({
+              letter: true,
+              correct: show && notYetTyped && input[idx] === letter,
+              incorrect: show && notYetTyped && input[idx] !== letter,
+              upcoming: !show,
+            })}
+          >
             {letter}
           </span>
         );

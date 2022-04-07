@@ -21,7 +21,22 @@ code {
 #dev {
   display: flex;
   gap: .5rem;
-  width: 50%;
+  width: 45%;
   flex-wrap: wrap;
-  background: #00000015;
+  /* background: #00000015; */
+  position: relative;
+}
+
+.wrapper {
+  height: 100px;
+  overflow: hidden;
+  justify-content: center;
+  display: flex;
+  margin-top: 10vh;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
 }
