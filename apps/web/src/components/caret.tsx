@@ -1,20 +1,22 @@
-import { useLayoutEffect, useMemo } from 'react';
+import { RefObject, useLayoutEffect, useMemo } from 'react';
 import { animated } from 'react-spring';
 import { useSpring } from 'react-spring';
-import { useRecoilValue } from 'recoil';
-import { currentLetter } from '../state';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { currentLetter, eolState } from '../state';
 
 export const Caret = ({
   index,
   words,
-  setEol,
   wordsRef,
-  breaks,
+  breakAt,
 }: {
+  wordsRef: RefObject<HTMLDivElement>;
   index: number;
   words: string[];
+  breakAt?: number;
 }) => {
   const curLetter = useRecoilValue(currentLetter);
+  const setEol = useSetRecoilState(eolState);
   const [caretPos, setCaretPos] = useSpring(() => ({
     transform: 'translate(0,0)',
     config: { duration: 55, friction: 5, precision: 1 },
@@ -72,8 +74,7 @@ export const Caret = ({
     setCaretPos,
     words,
     wordsRef,
-    // setEol,
-    breaks,
+    breakAt,
   ]);
 
   return (

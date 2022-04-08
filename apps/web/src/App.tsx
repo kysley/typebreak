@@ -17,7 +17,6 @@ function App() {
   const [breakIndex, setbreakIndex] = useState<number>(0);
   const [lastBreakIndex, setLastBreakIndex] = useState<number>();
   const [timesBroke, setTimesBroke] = useState(0);
-  const [eol, setEol] = useState(false);
 
   const time = useTypingTimer();
 
@@ -25,6 +24,8 @@ function App() {
     inputRef.current?.focus();
   };
 
+  // todo: fix edge case where you break again at the last broken index
+  // this happens when you backspace to the previous line to fix a word
   useEffect(() => {
     if (breakAt) {
       if (index >= breakAt) {
@@ -37,13 +38,6 @@ function App() {
       }
     }
   }, [breakAt, breakIndex, index, lastBreakIndex, setbreakIndex]);
-
-  // useEffect(() => {
-  //   if (index < lastBreakIndex) {
-  //     console.log('backwards');
-  //     setbreakIndex(lastBreakIndex);
-  //   }
-  // }, [index, lastBreakIndex]);
 
   // handle line break
   useLayoutEffect(() => {
@@ -74,7 +68,7 @@ function App() {
 
   return (
     <div className='App container'>
-      <HiddenInput ref={inputRef} eol={eol} setEol={(v) => setEol(v)} />
+      <HiddenInput ref={inputRef} />
       <span>time: {time}</span>
       <div className='wrapper'>
         <div onClick={handleFocus} ref={wordsRef} id='dev'>
@@ -82,8 +76,8 @@ function App() {
             <Word
               myIndex={idx}
               key={`${word}-${idx}`}
-              indexState={index}
-              hidden={timesBroke > 1 && lastBreakIndex > idx}
+              show={idx <= index}
+              hidden={timesBroke > 1 && (lastBreakIndex || 0) > idx}
             />
           ))}
         </div>
@@ -92,8 +86,7 @@ function App() {
         wordsRef={wordsRef}
         index={index}
         words={words}
-        setEol={(v) => setEol(v)}
-        breaks={breakAt}
+        breakAt={breakAt}
       />
     </div>
   );

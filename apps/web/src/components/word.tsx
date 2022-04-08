@@ -1,19 +1,18 @@
 import { useRecoilValue } from 'recoil';
 import clsx from 'clsx';
-import { inputAtIndex, wordsState } from '../state';
+import { wordsState } from '../state';
 import './word.css';
+import { memo } from 'react';
 
 type WordProps = {
   myIndex: number;
-  indexState: number;
   hidden: boolean;
+  show: boolean;
 };
-export function Word({ myIndex, indexState, hidden }: WordProps) {
+function WordComponent({ myIndex, hidden, show }: WordProps) {
   const word = useRecoilValue(wordsState(myIndex));
-  const input = useRecoilValue(inputAtIndex(myIndex));
 
-  const show = myIndex <= indexState;
-  const inputLength = input.length - 1;
+  const inputLength = word.input.length - 1;
 
   const wordClasses = clsx({
     word: true,
@@ -32,8 +31,8 @@ export function Word({ myIndex, indexState, hidden }: WordProps) {
             key={`${letter}-${idx}`}
             className={clsx({
               letter: true,
-              correct: show && notYetTyped && input[idx] === letter,
-              incorrect: show && notYetTyped && input[idx] !== letter,
+              correct: show && notYetTyped && word.input[idx] === letter,
+              incorrect: show && notYetTyped && word.input[idx] !== letter,
               upcoming: !show,
             })}
           >
@@ -41,9 +40,9 @@ export function Word({ myIndex, indexState, hidden }: WordProps) {
           </span>
         );
       })}
-      {input.length > word.name.length && (
+      {word.input.length > word.name.length && (
         <>
-          {input
+          {word.input
             .substring(word.name.length)
             .split('')
             .map((letter, idx) => {
@@ -58,3 +57,5 @@ export function Word({ myIndex, indexState, hidden }: WordProps) {
     </span>
   );
 }
+
+export const Word = memo(WordComponent);

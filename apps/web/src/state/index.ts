@@ -110,16 +110,18 @@ export type WordState = {
   name: string;
   perfect: boolean;
   flawless: boolean;
+  input: string;
 };
 export const wordsState = atomFamily({
   key: 'wordsState',
-  default: selectorFamily({
+  default: selectorFamily<WordState, number>({
     key: 'wordsState/default',
     get:
       (param: number) =>
       ({ get }) => {
         const word = get(wordsAtom)[param];
         return {
+          input: '',
           name: word,
           perfect: false, // completed without mistakes, allowing backspaces
           flawless: false, // completed without mistakes , no backspaces
@@ -134,38 +136,7 @@ export const wordsStateAtCurrentIndex = selector<WordState>({
     const currentIndex = get(indexAtom);
     return get(wordsState(currentIndex));
   },
-  set:
-    ({ get, set }) =>
-    (newValue: WordState) =>
-      set(wordsState(get(indexAtom)), newValue),
-});
-
-// this could become atomfamily to keep input per word
-export const inputAtom = atom<string[]>({
-  key: 'inputAtom',
-  default: [''],
-});
-
-export const inputAtIndex = selectorFamily({
-  key: 'inputAtom/index',
-  get:
-    (index: number) =>
-    ({ get }) =>
-      get(inputAtom)[index] || '',
-});
-
-export const inputAtCurrentIndex = selector<string>({
-  key: 'inputAtom/cI',
-  get: ({ get }) => {
-    return get(inputAtom)[get(indexAtom)];
-  },
-  set: ({ get, set }, value) => {
-    const idx = get(indexAtom);
-    const abc = get(inputAtom);
-    const cpy = [...abc];
-    cpy[idx] = value;
-    set(inputAtom, cpy);
-  },
+  set: ({ get, set }, newValue) => set(wordsState(get(indexAtom)), newValue),
 });
 
 export const indexAtom = atom({
@@ -176,7 +147,7 @@ export const indexAtom = atom({
 export const currentLetter = selector({
   key: 'indexAtom/letter',
   get: ({ get }) => {
-    return get(inputAtCurrentIndex).length;
+    return get(wordsStateAtCurrentIndex).input.length;
   },
 });
 
@@ -189,4 +160,14 @@ export type TypingState = 'IDLE' | 'STARTED' | 'DONE';
 export const typingState = atom<TypingState>({
   key: 'typingstate',
   default: 'IDLE',
+});
+
+export const mistakesState = atom<number>({
+  key: 'mistakesState',
+  default: 0,
+});
+
+export const eolState = atom({
+  key: 'eol',
+  default: false,
 });
