@@ -20,6 +20,8 @@ function WordComponent({ myIndex, hidden, show }: WordProps) {
     flawless: word.flawless,
     perfect: !word.flawless && word.perfect,
     incorrect: !word.perfect,
+    destroyed: word.destroyed,
+    mine: word.modifier?.type === 'MINE',
   });
 
   return (

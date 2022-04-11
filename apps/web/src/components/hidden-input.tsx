@@ -6,6 +6,7 @@ import {
   typingState,
   wordsState,
   wordsStateAtCurrentIndex,
+  WordState,
 } from '../state';
 
 export const HiddenInput = forwardRef((props, ref: any) => {
@@ -29,10 +30,17 @@ export const HiddenInput = forwardRef((props, ref: any) => {
         console.log('all selected, replacing with next key');
         setWordState({ ...newWordState, input: e.key });
       } else {
-        setWordState({
-          ...newWordState,
-          input: (newWordState.input += e.key),
-        });
+        if (wordState.modifier?.trigger === 'TYPE') {
+          handleWordModifier({
+            ...newWordState,
+            input: (newWordState.input += e.key),
+          });
+        } else {
+          setWordState({
+            ...newWordState,
+            input: (newWordState.input += e.key),
+          });
+        }
       }
     }
 
@@ -77,6 +85,34 @@ export const HiddenInput = forwardRef((props, ref: any) => {
     selectedAllRef.current = false;
   };
 
+  const handleWordModifier = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async (wordState: WordState) => {
+        const indexState = await snapshot.getPromise(indexAtom);
+
+        function modifyWord(value: Partial<WordState>, index?: number) {
+          if (index) {
+            set(wordsState(index), (prev) => ({ ...prev, ...value }));
+          } else {
+            set(wordsState(indexState), { ...wordState, ...value });
+          }
+        }
+
+        const executed = wordState.modifier?.execute(
+          { modifyWord, addWord: () => {} },
+          wordState,
+          indexState,
+        );
+        if (executed) {
+          set(indexAtom, (prev) => (prev += 4));
+        }
+        console.log(executed);
+        if (!executed) {
+          set(wordsState(indexState), wordState);
+        }
+      },
+  );
+
   const handleCanBackspaceThroughWord = useRecoilCallback(
     ({ snapshot, set }) =>
       async () => {
@@ -85,8 +121,7 @@ export const HiddenInput = forwardRef((props, ref: any) => {
         const previousWordState = await snapshot.getPromise(
           wordsState(indexState - 1),
         );
-
-        if (previousWordState.perfect) return;
+        if (previousWordState.perfect || previousWordState.destroyed) return;
 
         set(indexAtom, (prev) => (prev -= 1));
       },

@@ -1,4 +1,5 @@
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
+import { mineModifierFactory, WordModifier } from '../utils';
 
 export const wordsAtom = atom({
   key: 'wordsAtom',
@@ -111,20 +112,24 @@ export type WordState = {
   perfect: boolean;
   flawless: boolean;
   input: string;
+  readonly modifier?: WordModifier;
+  destroyed: boolean;
 };
 export const wordsState = atomFamily({
   key: 'wordsState',
-  default: selectorFamily<WordState, number>({
+  default: selectorFamily({
     key: 'wordsState/default',
     get:
       (param: number) =>
-      ({ get }) => {
+      ({ get }): WordState => {
         const word = get(wordsAtom)[param];
         return {
           input: '',
           name: word,
           perfect: false, // completed without mistakes, allowing backspaces
           flawless: false, // completed without mistakes , no backspaces
+          destroyed: false,
+          modifier: param === 1 ? mineModifierFactory() : undefined,
         };
       },
   }),
@@ -170,4 +175,9 @@ export const mistakesState = atom<number>({
 export const eolState = atom({
   key: 'eol',
   default: false,
+});
+
+export const percentCompleted = selector({
+  key: 'percentCompleted',
+  get: ({ get }) => get(wordsAtom).length / get(indexAtom),
 });

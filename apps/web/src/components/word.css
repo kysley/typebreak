@@ -16,6 +16,15 @@
   border-bottom: 2px solid blue;
 }
 
+.word.destroyed {
+  border-bottom: 2px gray outset;
+  opacity: .3;
+}
+
+.word.mine {
+  border-bottom: 2px dashed red;
+}
+
 .letter.incorrect {
   color: red;
 }
