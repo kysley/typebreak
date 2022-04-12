@@ -24,6 +24,12 @@
 .word.mine {
   border-bottom: 2px dashed red;
 }
+.word.icy {
+  border-bottom: 2px dashed blue;
+}
+.word.frozen {
+  background-color: powderblue;
+}
 
 .letter.incorrect {
   color: red;

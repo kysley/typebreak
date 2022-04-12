@@ -22,6 +22,8 @@ function WordComponent({ myIndex, hidden, show }: WordProps) {
     incorrect: !word.perfect,
     destroyed: word.destroyed,
     mine: word.modifier?.type === 'MINE',
+    icy: word.modifier?.type === 'FROZEN',
+    frozen: word.frozen,
   });
 
   return (
