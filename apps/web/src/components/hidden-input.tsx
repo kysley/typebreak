@@ -17,47 +17,45 @@ export const HiddenInput = forwardRef((props, ref: any) => {
 
   const hasBackspacedCurrentWord = useRef(false);
 
+  // Todo: modify newWordState directly and setWordState at the end
+  // this also makes our handleWordModifier's a lot cleaner
+  //
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const ctrl = e.ctrlKey || e.metaKey;
+    const isCtrl = e.ctrlKey || e.metaKey;
+    const isText = e.key.length === 1 && e.key !== ' ' && !isCtrl && !eol;
+    const isBackspace = e.key === 'Backspace';
+    const isSpace = e.key === ' ';
 
     const newWordState = { ...wordState };
 
-    if (e.key.length === 1 && e.key !== ' ' && !ctrl && !eol) {
+    if (isText) {
       if (usertypingState === 'IDLE') {
         setTypingState('STARTED');
       }
       if (selectedAllRef.current) {
         console.log('all selected, replacing with next key');
-        setWordState({ ...newWordState, input: e.key });
+        newWordState.input = e.key;
       } else {
+        newWordState.input += e.key;
         if (wordState.modifier?.trigger === 'TYPE') {
-          handleWordModifier({
-            ...newWordState,
-            input: (newWordState.input += e.key),
-          });
-        } else {
-          setWordState({
-            ...newWordState,
-            input: (newWordState.input += e.key),
-          });
+          handleWordModifier(newWordState);
         }
       }
     }
 
-    if (ctrl) {
-      if (e.key === 'Backspace') {
+    if (isCtrl) {
+      if (isBackspace) {
         console.log('ctrl + backspace');
-        setWordState({ ...newWordState, input: '' });
-        return;
+        newWordState.input = '';
       }
       if (e.key === 'a') {
         console.log('ctrl + a');
         selectedAllRef.current = true;
-        return;
       }
+      setWordState(newWordState);
     }
 
-    if (e.key === 'Backspace') {
+    if (isBackspace) {
       hasBackspacedCurrentWord.current = true;
       setEol(false);
       if (wordState.input.length === 0) {
@@ -67,22 +65,31 @@ export const HiddenInput = forwardRef((props, ref: any) => {
       }
       if (selectedAllRef.current) {
         console.log('backspacing all');
-        setWordState({ ...newWordState, input: '' });
+        newWordState.input = '';
       } else {
         console.log('backspacing normal');
-        setWordState({
-          ...newWordState,
-          input: newWordState.input.substring(0, newWordState.input.length - 1),
-        });
+
+        newWordState.input = newWordState.input.substring(
+          0,
+          newWordState.input.length - 1,
+        );
       }
-    } else if (e.key === ' ') {
+    }
+
+    if (isSpace) {
       if (wordState.input.length === 0) return;
+      if (wordState.modifier?.trigger === 'SPACE') {
+        handleWordModifier(newWordState);
+      }
       console.log('space');
       updateOnSpace(hasBackspacedCurrentWord.current);
       hasBackspacedCurrentWord.current = false;
     }
 
-    selectedAllRef.current = false;
+    if ((isText || isBackspace) && selectedAllRef.current) {
+      selectedAllRef.current = false;
+    }
+    setWordState(newWordState);
   };
 
   const handleWordModifier = useRecoilCallback(
@@ -98,12 +105,12 @@ export const HiddenInput = forwardRef((props, ref: any) => {
           }
         }
 
-        const executed = wordState.modifier?.execute(
+        const executed = wordState.modifier?.onTrigger(
           { modifyWord, addWord: () => {} },
           wordState,
           indexState,
         );
-        if (executed) {
+        if (executed && wordState.modifier?.type === 'MINE') {
           set(indexAtom, (prev) => (prev += 4));
         }
         console.log(executed);
@@ -137,13 +144,17 @@ export const HiddenInput = forwardRef((props, ref: any) => {
         const indexState = await snapshot.getPromise(indexAtom);
         const isPerfect = currentWordState.name === currentWordState.input;
 
-        set(wordsState(indexState), {
-          ...currentWordState,
-          perfect: isPerfect,
-          flawless: isPerfect && !hasBackspaced,
-        });
-        setEol(false);
-        set(indexAtom, (prev) => (prev += 1));
+        // We handle the frozen modifier logic in handleWordModifier
+        // todo: is there a better way to do this?
+        if (!currentWordState.frozen) {
+          set(wordsState(indexState), {
+            ...currentWordState,
+            perfect: isPerfect,
+            flawless: isPerfect && !hasBackspaced,
+          });
+          setEol(false);
+          set(indexAtom, (prev) => (prev += 1));
+        }
       },
     [],
   );

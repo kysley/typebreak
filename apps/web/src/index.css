@@ -21,13 +21,14 @@ code {
 #dev {
   display: flex;
   gap: .5rem;
-  width: 45%;
+  width: 45vw;
   flex-wrap: wrap;
   /* background: #00000015; */
   position: relative;
 }
 
 .wrapper {
+  min-height: 100px;
   height: 100px;
   overflow: hidden;
   justify-content: center;
