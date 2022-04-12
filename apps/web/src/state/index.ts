@@ -1,110 +1,14 @@
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
-import { mineModifierFactory, WordModifier } from '../utils';
+import { getWords } from 'wordkit';
+import {
+  frozenWordFactory,
+  mineModifierFactory,
+  WordModifier,
+} from '../modifiers';
 
 export const wordsAtom = atom({
   key: 'wordsAtom',
-  default: [
-    'own',
-    'tell',
-    'new',
-    'would',
-    'face',
-    'right',
-    'need',
-    'hold',
-    'under',
-    'number',
-    'now',
-    'say',
-    'not',
-    'house',
-    'consider',
-    'by',
-    'some',
-    'show',
-    'now',
-    'and',
-    'that',
-    'line',
-    'do',
-    'but',
-    'life',
-    'only',
-    'present',
-    'tell',
-    'to',
-    'have',
-    'turn',
-    'run',
-    'back',
-    'help',
-    'would',
-    'old',
-    'over',
-    'much',
-    'he',
-    'these',
-    'number',
-    'while',
-    'they',
-    'old',
-    'it',
-    'a',
-    'want',
-    'should',
-    'write',
-    'lead',
-    'own',
-    'tell',
-    'new',
-    'would',
-    'face',
-    'right',
-    'need',
-    'hold',
-    'under',
-    'number',
-    'now',
-    'say',
-    'not',
-    'house',
-    'consider',
-    'by',
-    'some',
-    'show',
-    'now',
-    'and',
-    'that',
-    'line',
-    'do',
-    'but',
-    'life',
-    'only',
-    'present',
-    'tell',
-    'to',
-    'have',
-    'turn',
-    'run',
-    'back',
-    'help',
-    'would',
-    'old',
-    'over',
-    'much',
-    'he',
-    'these',
-    'number',
-    'while',
-    'they',
-    'old',
-    'it',
-    'a',
-    'want',
-    'should',
-    'write',
-    'lead',
-  ],
+  default: getWords(50).split(','),
 });
 
 export type WordState = {
@@ -114,6 +18,7 @@ export type WordState = {
   input: string;
   readonly modifier?: WordModifier;
   destroyed: boolean;
+  frozen: boolean;
 };
 export const wordsState = atomFamily({
   key: 'wordsState',
@@ -129,7 +34,13 @@ export const wordsState = atomFamily({
           perfect: false, // completed without mistakes, allowing backspaces
           flawless: false, // completed without mistakes , no backspaces
           destroyed: false,
-          modifier: param === 1 ? mineModifierFactory() : undefined,
+          frozen: param === 3 ? true : false,
+          modifier:
+            param === 1
+              ? mineModifierFactory()
+              : param === 3
+              ? frozenWordFactory()
+              : undefined,
         };
       },
   }),
