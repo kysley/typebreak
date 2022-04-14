@@ -3,6 +3,7 @@ import { animated } from 'react-spring';
 import { useSpring } from 'react-spring';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { currentLetter, eolState } from '../state';
+import { styled } from '../stitches.conf';
 
 export const Caret = ({
   index,
@@ -77,17 +78,14 @@ export const Caret = ({
     breakAt,
   ]);
 
-  return (
-    <animated.div
-      style={{
-        ...caretPos,
-        left: 0,
-        top: 5,
-        width: '3px',
-        height: '1.5rem',
-        position: 'absolute',
-        backgroundColor: 'darkorchid',
-      }}
-    />
-  );
+  return <StyledCaret style={caretPos} />;
 };
+
+const StyledCaret = styled(animated.div, {
+  left: 0,
+  top: 5,
+  width: '3px',
+  height: '1.5rem',
+  position: 'absolute',
+  backgroundColor: '$caret',
+});
