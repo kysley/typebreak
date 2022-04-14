@@ -2,7 +2,7 @@ import { WordState } from '../state';
 
 type ModifierExecuteTriggerType = 'SPACE' | 'BACKSPACE' | 'TYPE' | 'INCORRECT';
 
-type ModifierTypes = 'MINE' | 'FROZEN';
+type ModifierTypes = 'MINE' | 'ICY';
 
 export type WordModifier = {
   type: ModifierTypes;
@@ -21,15 +21,4 @@ export type WordModifier = {
 };
 
 export { mineModifierFactory } from './mine.modifier';
-export { frozenWordFactory } from './frozen.modifier';
-/*
-
-word -> type
-type: {
-  trigger: backspace, type, space
-  execute: ({addWord, modifyWord}, self) => {
-    // do things here
-  }
-}
-
-*/
+export { icyWordFactory } from './icy.modifier';

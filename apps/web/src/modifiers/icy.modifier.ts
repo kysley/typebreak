@@ -1,8 +1,10 @@
 import { WordModifier } from '.';
 
-export function frozenWordFactory(): WordModifier {
+// when a word is frozen it needs to be typed twice
+// icy is the modifier, icy things are frozen
+export function icyWordFactory(): WordModifier {
   return {
-    type: 'FROZEN',
+    type: 'ICY',
     trigger: 'SPACE',
     onTrigger: ({ modifyWord }, self, index) => {
       if (self.input === self.name && self.frozen) {

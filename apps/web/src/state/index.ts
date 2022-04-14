@@ -1,7 +1,7 @@
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
 import { getWords } from 'wordkit';
 import {
-  frozenWordFactory,
+  icyWordFactory,
   mineModifierFactory,
   WordModifier,
 } from '../modifiers';
@@ -13,7 +13,7 @@ export const wordsAtom = atom({
 
 export type WordState = {
   name: string;
-  perfect: boolean;
+  perfect: boolean | null;
   flawless: boolean;
   input: string;
   readonly modifier?: WordModifier;
@@ -31,7 +31,7 @@ export const wordsState = atomFamily({
         return {
           input: '',
           name: word,
-          perfect: false, // completed without mistakes, allowing backspaces
+          perfect: null, // completed without mistakes, allowing backspaces
           flawless: false, // completed without mistakes , no backspaces
           destroyed: false,
           frozen: param === 3 ? true : false,
@@ -39,7 +39,7 @@ export const wordsState = atomFamily({
             param === 1
               ? mineModifierFactory()
               : param === 3
-              ? frozenWordFactory()
+              ? icyWordFactory()
               : undefined,
         };
       },
