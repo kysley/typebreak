@@ -1,4 +1,11 @@
-import { atom, atomFamily, selector, selectorFamily } from 'recoil';
+import {
+  atom,
+  atomFamily,
+  DefaultValue,
+  selector,
+  selectorFamily,
+} from 'recoil';
+import { v4 as uuid } from 'uuid';
 import { getWords } from 'wordkit';
 import {
   icyWordFactory,
@@ -24,6 +31,15 @@ export const wordsState = atomFamily({
   key: 'wordsState',
   default: selectorFamily({
     key: 'wordsState/default',
+    set:
+      (id: number) =>
+      ({ set, reset }, value: WordState | DefaultValue) => {
+        if (value instanceof DefaultValue) {
+          reset(wordsState(id));
+          return;
+        }
+        set(wordsState(id), value);
+      },
     get:
       (param: number) =>
       ({ get }): WordState => {
@@ -52,7 +68,14 @@ export const wordsStateAtCurrentIndex = selector<WordState>({
     const currentIndex = get(indexAtom);
     return get(wordsState(currentIndex));
   },
-  set: ({ get, set }, newValue) => set(wordsState(get(indexAtom)), newValue),
+  set: ({ get, set, reset }, newValue) => {
+    if (newValue instanceof DefaultValue) {
+      reset(wordsState(get(indexAtom)));
+      return;
+    }
+
+    set(wordsState(get(indexAtom)), newValue);
+  },
 });
 
 export const indexAtom = atom({

@@ -6,10 +6,12 @@ import { Word } from './components/word';
 import { HiddenInput } from './components/hidden-input';
 import { Caret } from './components/caret';
 import { useTypingTimer } from './hooks/use-typing-timer';
+import { useResetWordsState } from './hooks/use-arcade-mode';
 
 function App() {
   const words = useRecoilValue(wordsAtom);
   const index = useRecoilValue(indexAtom);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const wordsRef = useRef<HTMLDivElement>(null);
 
@@ -17,6 +19,8 @@ function App() {
   const [breakIndex, setbreakIndex] = useState<number>(0);
   const [lastBreakIndex, setLastBreakIndex] = useState<number>();
   const [timesBroke, setTimesBroke] = useState(0);
+
+  const { resetWordsState } = useResetWordsState();
 
   const time = useTypingTimer();
 
@@ -70,24 +74,31 @@ function App() {
     <div className='App container'>
       <HiddenInput ref={inputRef} />
       <span>time: {time}</span>
-      <div className='wrapper'>
-        <div onClick={handleFocus} ref={wordsRef} id='dev'>
-          {words.map((word, idx) => (
-            <Word
-              myIndex={idx}
-              key={`${word}-${idx}`}
-              show={idx <= index}
-              hidden={timesBroke > 1 && (lastBreakIndex || 0) > idx}
-            />
-          ))}
-        </div>
-      </div>
-      <Caret
-        wordsRef={wordsRef}
-        index={index}
-        words={words}
-        breakAt={breakAt}
-      />
+      <button tabIndex={0} onClick={resetWordsState}>
+        reset
+      </button>
+      {words.length && (
+        <>
+          <div className='wrapper'>
+            <div onClick={handleFocus} ref={wordsRef} id='dev'>
+              {words.map((word, idx) => (
+                <Word
+                  myIndex={idx}
+                  key={`${word}-${idx}`}
+                  show={idx <= index}
+                  hidden={timesBroke > 1 && (lastBreakIndex || 0) > idx}
+                />
+              ))}
+            </div>
+          </div>
+          <Caret
+            wordsRef={wordsRef}
+            index={index}
+            words={words}
+            breakAt={breakAt}
+          />
+        </>
+      )}
     </div>
   );
 }

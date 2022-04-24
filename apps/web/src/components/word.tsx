@@ -10,13 +10,12 @@ type WordProps = {
 };
 function WordComponent({ myIndex, hidden, show }: WordProps) {
   const word = useRecoilValue(wordsState(myIndex));
-
   const inputLength = word.input.length - 1;
 
   return (
     <StyledWord
       flawless={word.flawless}
-      perfect={(!word.flawless && word.perfect) || false}
+      // perfect={(!word.flawless && word.perfect) || false}
       incorrect={!word.perfect && word.perfect !== null}
       destroyed={word.destroyed}
       frozen={word.frozen}
@@ -62,9 +61,9 @@ export const StyledWord = styled('span', {
   borderBottom: '2px solid transparent',
   variants: {
     modifier: {
-      ICY: {
-        borderBottom: '2px dashed blue',
-      },
+      // ICY: {
+      //   borderBottom: '2px dashed blue',
+      // },
       MINE: {
         borderBottom: '2px dashed red',
       },
@@ -76,7 +75,7 @@ export const StyledWord = styled('span', {
     },
     frozen: {
       true: {
-        backgroundColor: 'powderblue',
+        borderBottom: '2px dotted powderblue',
       },
     },
     destroyed: {
@@ -87,14 +86,14 @@ export const StyledWord = styled('span', {
     },
     flawless: {
       true: {
-        borderBottom: '2px solid gold',
+        borderBottom: '2px solid $text',
       },
     },
-    perfect: {
-      true: {
-        borderBottom: '2px solid blue',
-      },
-    },
+    // perfect: {
+    //   true: {
+    //     borderBottom: '2px solid blue',
+    //   },
+    // },
     incorrect: {
       true: {
         borderBottom: '2px solid $error',
