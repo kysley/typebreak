@@ -1,4 +1,3 @@
-import { useRecoilCallback } from 'recoil';
 import { getWords } from 'wordkit';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -7,22 +6,22 @@ import {
   ModifierTypes,
   WordModifier,
 } from '../modifiers';
-import {
-  eolAtom,
-  indexAtom,
-  wordsAtom,
-  wordsStateAtom,
-  WordState,
-} from '../state';
-import { useTypingTimer } from './use-typing-timer';
+import { WordState } from '../state';
+import { useCallback } from 'react';
+import { useResetWordsState } from './use-reset-words-state';
 
-function useArcadeMode() {
-  const timer = useTypingTimer();
-  // const setWords = useSetRecoilState(wordsAtom);
+export function useArcadeMode() {
+  const { resetWordsState } = useResetWordsState();
 
-  // useEffect(() => {}, []);
+  const reset = useCallback(() => {
+    const words = getWords(50).split(',');
+    const arcadeWords = arcadifyWords(words);
+    resetWordsState(arcadeWords);
+  }, [resetWordsState]);
 
-  const reset = () => {};
+  return {
+    reset,
+  };
 }
 
 const modifierFactoryMap: Record<ModifierTypes, () => WordModifier> = {
@@ -38,16 +37,16 @@ export function arcadifyWords(words: string[]) {
     let modifierType: ModifierTypes | null = null;
     const chance = Math.random();
 
-    if (wordsSinceLastModifier > 5 || idx < 5) {
+    if (wordsSinceLastModifier > 3 || idx < 5) {
       if (chance > 0.85) {
         modifierType = 'MINE';
         wordsSinceLastModifier = 0;
       } else if (chance < 0.1) {
         modifierType = 'ICY';
         wordsSinceLastModifier = 0;
-      } else {
-        wordsSinceLastModifier += 1;
       }
+    } else {
+      wordsSinceLastModifier += 1;
     }
 
     return {
@@ -62,25 +61,4 @@ export function arcadifyWords(words: string[]) {
     };
   });
   return wordState;
-}
-
-export function useResetWordsState() {
-  const resetWordsState = useRecoilCallback(
-    ({ snapshot, reset, set }) =>
-      async () => {
-        const idx = await snapshot.getPromise(wordsAtom);
-        const words = getWords(50).split(',');
-        const arcadeWords = arcadifyWords(words);
-
-        set(wordsAtom, arcadeWords);
-        for (let i = idx.length; i >= 0; i--) {
-          reset(wordsStateAtom(i));
-        }
-        // set(wordsAtom, []);
-        reset(indexAtom);
-        reset(eolAtom);
-      },
-    [],
-  );
-  return { resetWordsState };
 }
