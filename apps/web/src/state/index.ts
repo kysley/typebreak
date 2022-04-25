@@ -112,4 +112,12 @@ export const percentCompletedAtom = selector({
   get: ({ get }) => get(wordsAtom).length / get(indexAtom),
 });
 
-// export const comboAtom;
+export const comboAtom = atom({
+  key: 'comboAtom',
+  default: 1.0,
+});
+
+export const scoreAtom = atom({
+  key: 'scoreAtom',
+  default: 0,
+});

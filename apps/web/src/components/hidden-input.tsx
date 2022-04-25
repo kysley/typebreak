@@ -7,6 +7,8 @@ import {
   wordsStateAtom,
   wordsStateAtCurrentIndex,
   WordState,
+  comboAtom,
+  scoreAtom,
 } from '../state';
 
 export const HiddenInput = forwardRef((props, ref: any) => {
@@ -143,8 +145,17 @@ export const HiddenInput = forwardRef((props, ref: any) => {
           wordsStateAtCurrentIndex,
         );
         const indexState = await snapshot.getPromise(indexAtom);
+        const comboState = await snapshot.getPromise(comboAtom);
         const isPerfect = currentWordState.name === currentWordState.input;
 
+        if (isPerfect) {
+          set(comboAtom, (prev) => (prev += 0.25));
+          set(scoreAtom, (prev) =>
+            prev === 0 ? 50 : (prev += 50 * comboState),
+          );
+        } else {
+          set(comboAtom, 1.0);
+        }
         // We handle the frozen modifier logic in handleWordModifier
         // todo: is there a better way to do this?
         if (!currentWordState.frozen) {
