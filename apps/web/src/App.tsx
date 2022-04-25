@@ -84,7 +84,7 @@ function App() {
               {words.map((word, idx) => (
                 <Word
                   myIndex={idx}
-                  key={`${word}-${idx}`}
+                  key={`${word.id}-${idx}`}
                   show={idx <= index}
                   hidden={timesBroke > 1 && (lastBreakIndex || 0) > idx}
                 />

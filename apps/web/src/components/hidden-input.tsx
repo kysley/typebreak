@@ -1,19 +1,19 @@
 import { forwardRef, useRef } from 'react';
 import { useRecoilCallback, useRecoilState } from 'recoil';
 import {
-  eolState,
+  eolAtom,
   indexAtom,
-  typingState,
-  wordsState,
+  typingStateAtom,
+  wordsStateAtom,
   wordsStateAtCurrentIndex,
   WordState,
 } from '../state';
 
 export const HiddenInput = forwardRef((props, ref: any) => {
-  const [eol, setEol] = useRecoilState(eolState);
+  const [eol, setEol] = useRecoilState(eolAtom);
   const [wordState, setWordState] = useRecoilState(wordsStateAtCurrentIndex);
   const selectedAllRef = useRef(false);
-  const [usertypingState, setTypingState] = useRecoilState(typingState);
+  const [usertypingState, setTypingState] = useRecoilState(typingStateAtom);
 
   const hasBackspacedCurrentWord = useRef(false);
 
@@ -89,6 +89,7 @@ export const HiddenInput = forwardRef((props, ref: any) => {
     if ((isText || isBackspace) && selectedAllRef.current) {
       selectedAllRef.current = false;
     }
+
     setWordState(newWordState);
   };
 
@@ -99,9 +100,9 @@ export const HiddenInput = forwardRef((props, ref: any) => {
 
         function modifyWord(value: Partial<WordState>, index?: number) {
           if (index) {
-            set(wordsState(index), (prev) => ({ ...prev, ...value }));
+            set(wordsStateAtom(index), (prev) => ({ ...prev, ...value }));
           } else {
-            set(wordsState(indexState), { ...wordState, ...value });
+            set(wordsStateAtom(indexState), { ...wordState, ...value });
           }
         }
 
@@ -115,7 +116,7 @@ export const HiddenInput = forwardRef((props, ref: any) => {
         }
         console.log(executed);
         if (!executed) {
-          set(wordsState(indexState), wordState);
+          set(wordsStateAtom(indexState), wordState);
         }
       },
   );
@@ -126,7 +127,7 @@ export const HiddenInput = forwardRef((props, ref: any) => {
         const indexState = await snapshot.getPromise(indexAtom);
 
         const previousWordState = await snapshot.getPromise(
-          wordsState(indexState - 1),
+          wordsStateAtom(indexState - 1),
         );
         if (previousWordState.perfect || previousWordState.destroyed) return;
 
@@ -147,7 +148,7 @@ export const HiddenInput = forwardRef((props, ref: any) => {
         // We handle the frozen modifier logic in handleWordModifier
         // todo: is there a better way to do this?
         if (!currentWordState.frozen) {
-          set(wordsState(indexState), {
+          set(wordsStateAtom(indexState), {
             ...currentWordState,
             perfect: isPerfect,
             flawless: isPerfect && !hasBackspaced,

@@ -1,41 +1,84 @@
-import { useEffect } from 'react';
-import { useRecoilCallback, useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilCallback } from 'recoil';
 import { getWords } from 'wordkit';
-import { eolState, indexAtom, wordsAtom, wordsState } from '../state';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  icyWordFactory,
+  mineModifierFactory,
+  ModifierTypes,
+  WordModifier,
+} from '../modifiers';
+import {
+  eolAtom,
+  indexAtom,
+  wordsAtom,
+  wordsStateAtom,
+  WordState,
+} from '../state';
 import { useTypingTimer } from './use-typing-timer';
 
-export function useArcadeMode() {
+function useArcadeMode() {
   const timer = useTypingTimer();
-  const setWords = useSetRecoilState(wordsAtom);
+  // const setWords = useSetRecoilState(wordsAtom);
 
   // useEffect(() => {}, []);
 
   const reset = () => {};
 }
 
-function arcadifyWords(words: string[]) {
-  let lastModIndex: number | null = null;
-  let mineLength = 5;
+const modifierFactoryMap: Record<ModifierTypes, () => WordModifier> = {
+  MINE: mineModifierFactory,
+  ICY: icyWordFactory,
+};
 
-  words.map((word, idx) => ({
-    word,
-  }));
+export function arcadifyWords(words: string[]) {
+  let wordsSinceLastModifier: number = 0;
+  // let modNotAllowedFor: number = 0;
+
+  const wordState = words.map<WordState>((word, idx) => {
+    let modifierType: ModifierTypes | null = null;
+    const chance = Math.random();
+
+    if (wordsSinceLastModifier > 5 || idx < 5) {
+      if (chance > 0.85) {
+        modifierType = 'MINE';
+        wordsSinceLastModifier = 0;
+      } else if (chance < 0.1) {
+        modifierType = 'ICY';
+        wordsSinceLastModifier = 0;
+      } else {
+        wordsSinceLastModifier += 1;
+      }
+    }
+
+    return {
+      destroyed: false,
+      flawless: false,
+      frozen: modifierType === 'ICY' ? true : false,
+      input: '',
+      name: word,
+      perfect: null,
+      modifier: modifierType ? modifierFactoryMap[modifierType]() : undefined,
+      id: uuidv4(),
+    };
+  });
+  return wordState;
 }
-
-function canPlaceMine(word, index, since) {}
 
 export function useResetWordsState() {
   const resetWordsState = useRecoilCallback(
     ({ snapshot, reset, set }) =>
       async () => {
         const idx = await snapshot.getPromise(wordsAtom);
-        // set(wordsAtom, getWords(50).split(','));
+        const words = getWords(50).split(',');
+        const arcadeWords = arcadifyWords(words);
+
+        set(wordsAtom, arcadeWords);
         for (let i = idx.length; i >= 0; i--) {
-          reset(wordsState(i));
+          reset(wordsStateAtom(i));
         }
         // set(wordsAtom, []);
         reset(indexAtom);
-        reset(eolState);
+        reset(eolAtom);
       },
     [],
   );

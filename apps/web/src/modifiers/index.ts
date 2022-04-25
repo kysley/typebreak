@@ -1,8 +1,12 @@
 import { WordState } from '../state';
 
-type ModifierExecuteTriggerType = 'SPACE' | 'BACKSPACE' | 'TYPE' | 'INCORRECT';
+export type ModifierExecuteTriggerType =
+  | 'SPACE'
+  | 'BACKSPACE'
+  | 'TYPE'
+  | 'INCORRECT';
 
-type ModifierTypes = 'MINE' | 'ICY';
+export type ModifierTypes = 'MINE' | 'ICY';
 
 export type WordModifier = {
   type: ModifierTypes;

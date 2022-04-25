@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTimer } from 'use-timer';
-import { timerType, typingState } from '../state';
+import { timerTypeAtom, typingStateAtom } from '../state';
 
 export function useTypingTimer() {
-  const timer = useRecoilValue(timerType);
-  const [userTypingState, setTypingState] = useRecoilState(typingState);
+  const timer = useRecoilValue(timerTypeAtom);
+  const [userTypingState, setTypingState] = useRecoilState(typingStateAtom);
 
   const { start, reset, time } = useTimer({
     autostart: false,

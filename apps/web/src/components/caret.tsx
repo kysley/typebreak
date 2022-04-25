@@ -2,7 +2,7 @@ import { RefObject, useLayoutEffect, useMemo } from 'react';
 import { animated } from 'react-spring';
 import { useSpring } from 'react-spring';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { currentLetter, eolState } from '../state';
+import { currentLetterAtom, eolAtom } from '../state';
 import { styled } from '../stitches.conf';
 
 export const Caret = ({
@@ -16,8 +16,8 @@ export const Caret = ({
   words: string[];
   breakAt?: number;
 }) => {
-  const curLetter = useRecoilValue(currentLetter);
-  const setEol = useSetRecoilState(eolState);
+  const curLetter = useRecoilValue(currentLetterAtom);
+  const setEol = useSetRecoilState(eolAtom);
   const [caretPos, setCaretPos] = useSpring(() => ({
     transform: 'translate(0,0)',
     config: { duration: 55, friction: 5, precision: 1 },
@@ -47,7 +47,7 @@ export const Caret = ({
     let dir: 'left' | 'right';
     let letter;
     let isExtraLetter = false;
-    if (curLetter >= words[index].length) {
+    if (curLetter >= words[index].name.length) {
       letter = letters[curLetter - 1];
       dir = 'right';
       isExtraLetter = true;

@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil';
-import { wordsState } from '../state';
+import { wordsStateAtom } from '../state';
 import { memo } from 'react';
 import { styled } from '../stitches.conf';
 
@@ -9,7 +9,7 @@ type WordProps = {
   show: boolean;
 };
 function WordComponent({ myIndex, hidden, show }: WordProps) {
-  const word = useRecoilValue(wordsState(myIndex));
+  const word = useRecoilValue(wordsStateAtom(myIndex));
   const inputLength = word.input.length - 1;
 
   return (
