@@ -100,16 +100,8 @@ export const HiddenInput = forwardRef((props, ref: any) => {
       async (wordState: WordState) => {
         const indexState = await snapshot.getPromise(indexAtom);
 
-        function modifyWord(value: Partial<WordState>, index?: number) {
-          if (index) {
-            set(wordsStateAtom(index), (prev) => ({ ...prev, ...value }));
-          } else {
-            set(wordsStateAtom(indexState), { ...wordState, ...value });
-          }
-        }
-
         const executed = wordState.modifier?.onTrigger(
-          { modifyWord, addWord: () => {} },
+          { snapshot, set },
           wordState,
           indexState,
         );
@@ -117,9 +109,6 @@ export const HiddenInput = forwardRef((props, ref: any) => {
           set(indexAtom, (prev) => (prev += 4));
         }
         console.log(executed);
-        if (!executed) {
-          set(wordsStateAtom(indexState), wordState);
-        }
       },
   );
 

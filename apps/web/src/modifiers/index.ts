@@ -1,3 +1,4 @@
+import { CallbackInterface, Snapshot } from 'recoil';
 import { WordState } from '../state';
 
 export type ModifierExecuteTriggerType =
@@ -13,11 +14,11 @@ export type WordModifier = {
   trigger: ModifierExecuteTriggerType;
   onTrigger: (
     {
-      addWord,
-      modifyWord,
+      snapshot,
+      set,
     }: {
-      addWord: (word: Partial<WordState>, index?: number) => void;
-      modifyWord: (newWord: Partial<WordState>, index?: number) => void;
+      snapshot: Snapshot;
+      set: CallbackInterface['set'];
     },
     self: WordState,
     index: number,
