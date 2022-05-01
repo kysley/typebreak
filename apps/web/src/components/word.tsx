@@ -20,7 +20,8 @@ function WordComponent({ myIndex, hidden, show }: WordProps) {
       destroyed={word.destroyed}
       frozen={word.frozen}
       hidden={hidden}
-      modifier={word.modifier?.type}
+      mine={word.modifier?.type === 'MINE'}
+      camo={!show && word.modifier?.type === 'CAMO'}
     >
       {word.name.split('').map((letter, idx) => {
         const notYetTyped = inputLength >= idx;
@@ -59,13 +60,17 @@ export const StyledWord = styled('span', {
   fontSize: '1.5rem',
   lineHeight: '1.5rem',
   borderBottom: '2px solid transparent',
+  // transition: 'all .1s ease-in',
   variants: {
-    modifier: {
-      // ICY: {
-      //   borderBottom: '2px dashed blue',
-      // },
-      MINE: {
-        borderBottom: '2px dashed red',
+    mine: {
+      true: {
+        borderBottom: '1px dashed red',
+      },
+    },
+    camo: {
+      true: {
+        borderBottom: '2px groove green',
+        color: '$background',
       },
     },
     hidden: {
@@ -75,7 +80,9 @@ export const StyledWord = styled('span', {
     },
     frozen: {
       true: {
-        borderBottom: '2px dotted powderblue',
+        // borderBottom: '2px dotted powderblue',
+        boxShadow: 'inset 0 0 20px #61cae4',
+        borderRadius: '3px',
       },
     },
     destroyed: {

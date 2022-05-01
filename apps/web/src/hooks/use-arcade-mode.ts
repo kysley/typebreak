@@ -1,6 +1,7 @@
 import { getWords } from 'wordkit';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  camoWordFactory,
   icyWordFactory,
   mineModifierFactory,
   ModifierTypes,
@@ -27,6 +28,7 @@ export function useArcadeMode() {
 const modifierFactoryMap: Record<ModifierTypes, () => WordModifier> = {
   MINE: mineModifierFactory,
   ICY: icyWordFactory,
+  CAMO: camoWordFactory,
 };
 
 export function arcadifyWords(words: string[]) {
@@ -43,6 +45,9 @@ export function arcadifyWords(words: string[]) {
         wordsSinceLastModifier = 0;
       } else if (chance < 0.1) {
         modifierType = 'ICY';
+        wordsSinceLastModifier = 0;
+      } else if (chance > 0.25 && chance < 0.35) {
+        modifierType = 'CAMO';
         wordsSinceLastModifier = 0;
       }
     } else {

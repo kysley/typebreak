@@ -7,12 +7,12 @@ export type ModifierExecuteTriggerType =
   | 'TYPE'
   | 'INCORRECT';
 
-export type ModifierTypes = 'MINE' | 'ICY';
+export type ModifierTypes = 'MINE' | 'ICY' | 'CAMO';
 
 export type WordModifier = {
   type: ModifierTypes;
-  trigger: ModifierExecuteTriggerType;
-  onTrigger: (
+  trigger?: ModifierExecuteTriggerType;
+  onTrigger?: (
     {
       snapshot,
       set,
@@ -27,3 +27,4 @@ export type WordModifier = {
 
 export { mineModifierFactory } from './mine.modifier';
 export { icyWordFactory } from './icy.modifier';
+export { camoWordFactory } from './camo.modifier';
