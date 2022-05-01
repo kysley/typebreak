@@ -21,8 +21,9 @@ code {
 
 #dev {
   display: flex;
-  gap: .5rem;
-  width: 45vw;
+  gap: .9rem .8rem;
+  width: 80%;
+  max-width: 70vw;
   flex-wrap: wrap;
   /* background: #00000015; */
   position: relative;
@@ -30,11 +31,12 @@ code {
 
 .wrapper {
   min-height: 100px;
-  height: 100px;
+  height: 120px;
   overflow: hidden;
   justify-content: center;
+  /* align-items: center; */
   display: flex;
-  margin-top: 10vh;
+  margin-top: 24vh;
 }
 
 .container {
