@@ -22,7 +22,7 @@ code {
 #dev {
   display: flex;
   gap: .9rem .8rem;
-  width: 80%;
+  /* width: 80%; */
   max-width: 70vw;
   flex-wrap: wrap;
   /* background: #00000015; */
@@ -36,7 +36,7 @@ code {
   justify-content: center;
   /* align-items: center; */
   display: flex;
-  margin-top: 24vh;
+  /* margin-top: 24vh; */
 }
 
 .container {
