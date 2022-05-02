@@ -9,6 +9,7 @@ import {
   WordState,
   multiplierAtom,
   scoreAtom,
+  comboAtom,
 } from '../state';
 
 export const HiddenInput = forwardRef((props, ref: any) => {
@@ -43,7 +44,9 @@ export const HiddenInput = forwardRef((props, ref: any) => {
               newWordState.input[newWordState.input.length - 1] ===
               newWordState.name[newWordState.input.length - 1]
             ) {
-              console.log('correct letter');
+              set(comboAtom, (prev) => (prev += 1));
+            } else {
+              set(comboAtom, 0);
             }
             if (wordState.modifier?.trigger === 'TYPE') {
               handleWordModifier(newWordState);
@@ -108,7 +111,7 @@ export const HiddenInput = forwardRef((props, ref: any) => {
       async (wordState: WordState) => {
         const indexState = await snapshot.getPromise(indexAtom);
 
-        const executed = wordState.modifier?.onTrigger(
+        const executed = wordState.modifier?.onTrigger?.(
           { snapshot, set },
           wordState,
           indexState,
@@ -146,7 +149,7 @@ export const HiddenInput = forwardRef((props, ref: any) => {
         const isPerfect = currentWordState.name === currentWordState.input;
 
         if (isPerfect) {
-          set(multiplierAtom, (prev) => (prev += 0.11));
+          // set(multiplierAtom, (prev) => (prev += 0.11));
           set(scoreAtom, (prev) =>
             prev === 0 ? 50 : (prev += 50 * multiplierState),
           );

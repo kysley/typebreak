@@ -9,6 +9,8 @@ import { getWords } from 'wordkit';
 import { arcadifyWords } from '../hooks/use-arcade-mode';
 import { WordModifier } from '../modifiers';
 
+export const COMBO_LIMIT = 22;
+
 export const wordsAtom = atom({
   key: 'wordsAtom',
   default: arcadifyWords(getWords(50).split(',')),
@@ -40,20 +42,6 @@ export const wordsStateAtom = atomFamily({
       (param: number) =>
       ({ get }): WordState => {
         return get(wordsAtom)[param];
-        // return {
-        //   input: '',
-        //   name: word,
-        //   perfect: null, // completed without mistakes, allowing backspaces
-        //   flawless: false, // completed without mistakes , no backspaces
-        //   destroyed: false,
-        //   frozen: param === 3 ? true : false,
-        //   modifier:
-        //     param === 1
-        //       ? mineModifierFactory()
-        //       : param === 3
-        //       ? icyWordFactory()
-        //       : undefined,
-        // };
       },
   }),
 });
@@ -109,12 +97,25 @@ export const eolAtom = atom({
 
 export const percentCompletedAtom = selector({
   key: 'percentCompleted',
-  get: ({ get }) => get(wordsAtom).length / get(indexAtom),
+  get: ({ get }) => (get(indexAtom) / get(wordsAtom).length) * 100,
 });
 
 export const comboAtom = atom({
   key: 'comboAtom',
-  default: 1.0,
+  default: 0,
+});
+
+export const multiplierAtom = selector<number>({
+  key: 'multiplierAtom',
+  get: ({ get }): number => {
+    const combo = get(comboAtom);
+    if (combo < COMBO_LIMIT) {
+      return 1;
+    }
+    return Math.floor(combo / COMBO_LIMIT) + 1;
+    // return Math.floor(get(comboAtom) / COMBO_LIMIT);
+  },
+  set: ({ set, reset }, newValue) => set(comboAtom, 0),
 });
 
 export const scoreAtom = atom({
