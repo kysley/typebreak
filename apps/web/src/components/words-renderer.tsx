@@ -61,7 +61,7 @@ export const WordsRenderer = () => {
     if (nextLineBreak) setBreak(nextLineBreak);
   }, [index]);
   return (
-    <div className='App container'>
+    <div>
       <HiddenInput ref={inputRef} />
 
       {words.length && (

@@ -167,7 +167,13 @@ export const HiddenInput = forwardRef((props, ref: any) => {
       onKeyDown={handleKeyDown}
       value={wordState.input}
       readOnly
-      // style={{ visibility: 'hidden' }} this doesnt let me focus the input
+      style={{
+        zIndex: -1,
+        resize: 'none',
+        position: 'fixed',
+        pointerEvents: 'none',
+        opacity: 0,
+      }}
     />
   );
 });
