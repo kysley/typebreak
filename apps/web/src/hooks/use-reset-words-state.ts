@@ -5,6 +5,7 @@ import {
   focusedAtom,
   indexAtom,
   mistakesAtom,
+  scoreAtom,
   wordsAtom,
   wordsStateAtom,
   WordState,
@@ -24,6 +25,7 @@ export function useResetWordsState() {
         reset(eolAtom);
         reset(comboAtom);
         reset(mistakesAtom);
+        reset(scoreAtom);
         set(focusedAtom, (p) => p + 1);
       },
     [],

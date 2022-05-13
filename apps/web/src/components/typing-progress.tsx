@@ -82,7 +82,7 @@ function ScoreDisplay() {
     >
       <animated.span>{props.val.to((val) => Math.floor(val))}</animated.span>
       {numberTransitions((styles, item) => (
-        <animated.div {...styles}>{item.value}</animated.div>
+        <animated.div style={styles}>{item.value}</animated.div>
         // <animated.span style={numberProps}>{delta}</animated.span>
       ))}
     </div>
