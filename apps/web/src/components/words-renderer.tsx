@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { indexAtom, wordsAtom } from '../state';
+import { useRefocus } from '../hooks/use-refocus';
+import { focusedAtom, indexAtom, wordsAtom } from '../state';
 import { Caret } from './caret';
 import { HiddenInput } from './hidden-input';
 import { Word } from './word';
@@ -11,14 +12,19 @@ export const WordsRenderer = () => {
   const index = useRecoilValue(indexAtom);
   const wordsRef = useRef<HTMLDivElement>(null);
 
+  const focusTrigger = useRecoilValue(focusedAtom);
+
+  const refocus = useRefocus();
+
   const [breakAt, setBreak] = useState<number>();
   const [breakIndex, setbreakIndex] = useState<number>(0);
   const [lastBreakIndex, setLastBreakIndex] = useState<number>();
   const [timesBroke, setTimesBroke] = useState(0);
 
-  const handleFocus = () => {
+  useEffect(() => {
     inputRef.current?.focus();
-  };
+  }, [focusTrigger]);
+
   // todo: fix edge case where you break again at the last broken index
   // this happens when you backspace to the previous line to fix a word
   useEffect(() => {
@@ -67,7 +73,7 @@ export const WordsRenderer = () => {
       {words.length && (
         <>
           <div className='wrapper'>
-            <div onClick={handleFocus} ref={wordsRef} id='dev'>
+            <div ref={wordsRef} id='dev' onClick={() => refocus()}>
               {words.map((word, idx) => (
                 <Word
                   myIndex={idx}

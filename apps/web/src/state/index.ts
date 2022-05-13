@@ -76,7 +76,7 @@ export const currentLetterAtom = selector({
 
 export const timerTypeAtom = atom<'INCREMENTAL' | 'DECREMENTAL'>({
   key: 'timertype',
-  default: 'INCREMENTAL',
+  default: 'DECREMENTAL',
 });
 
 export type TypingState = 'IDLE' | 'STARTED' | 'DONE';
@@ -97,7 +97,7 @@ export const eolAtom = atom({
 
 export const percentCompletedAtom = selector({
   key: 'percentCompleted',
-  get: ({ get }) => (get(indexAtom) / get(wordsAtom).length) * 100,
+  get: ({ get }) => Math.floor((get(indexAtom) / get(wordsAtom).length) * 100),
 });
 
 export const comboAtom = atom({
@@ -122,3 +122,33 @@ export const scoreAtom = atom({
   key: 'scoreAtom',
   default: 0,
 });
+
+export const focusedAtom = atom({
+  key: 'focusedAtom',
+  default: 0,
+});
+
+function calculateWPM({
+  index,
+  time,
+  wordsState,
+}: {
+  index: number;
+  time: number;
+  wordsState: WordState[];
+}) {
+  let correctWords = 0;
+  let incorrectWords = 0;
+
+  for (let i = 0; i <= index; i++) {
+    const word = wordsState[i];
+    if (word.perfect) correctWords += word.name.length;
+    else {
+      incorrectWords += word.name
+        .split('')
+        .findIndex((letter, index) => word.input[index] !== letter);
+    }
+  }
+  const wpm = Math.round(((correctWords + index) * (60 / time)) / 5);
+  return wpm;
+}

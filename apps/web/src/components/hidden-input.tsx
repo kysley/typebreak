@@ -10,6 +10,7 @@ import {
   multiplierAtom,
   scoreAtom,
   comboAtom,
+  mistakesAtom,
 } from '../state';
 
 export const HiddenInput = forwardRef((props, ref: any) => {
@@ -47,6 +48,7 @@ export const HiddenInput = forwardRef((props, ref: any) => {
               set(comboAtom, (prev) => (prev += 1));
             } else {
               set(comboAtom, 0);
+              set(mistakesAtom, (prev) => (prev += 1));
             }
             if (wordState.modifier?.trigger === 'TYPE') {
               handleWordModifier(newWordState);

@@ -15,7 +15,7 @@ export function useArcadeMode() {
   const { resetWordsState } = useResetWordsState();
 
   const reset = useCallback(() => {
-    const words = getWords(50).split(',');
+    const words = getWords(100).split(',');
     const arcadeWords = arcadifyWords(words);
     resetWordsState(arcadeWords);
   }, [resetWordsState]);

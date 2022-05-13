@@ -9,7 +9,8 @@ export function useTypingTimer() {
 
   const { start, reset, time } = useTimer({
     autostart: false,
-    initialTime: 0,
+    initialTime: timer === 'INCREMENTAL' ? 0 : 60,
+    endTime: timer === 'INCREMENTAL' ? undefined : 0,
     timerType: timer,
     onTimeOver: () => setTypingState('DONE'),
   });

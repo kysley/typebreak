@@ -1,7 +1,10 @@
 import { useRecoilCallback } from 'recoil';
 import {
+  comboAtom,
   eolAtom,
+  focusedAtom,
   indexAtom,
+  mistakesAtom,
   wordsAtom,
   wordsStateAtom,
   WordState,
@@ -19,6 +22,9 @@ export function useResetWordsState() {
         }
         reset(indexAtom);
         reset(eolAtom);
+        reset(comboAtom);
+        reset(mistakesAtom);
+        set(focusedAtom, (p) => p + 1);
       },
     [],
   );
