@@ -1,6 +1,6 @@
 import { WordsRenderer } from './components/words-renderer';
 import './App.css';
-import { TypingProgress } from './components/typing-progress';
+import { TypingInfo } from './components/typing-info';
 import { styled } from './stitches.conf';
 import { useArcadeMode } from './hooks/use-arcade-mode';
 import { useTypingTimer } from './hooks/use-typing-timer';
@@ -9,12 +9,8 @@ function App() {
   const duration = useTypingTimer();
   return (
     <div className='App container'>
-      {/* <button tabIndex={0} onClick={resetWordsState}>
-        reset
-      </button> */}
       <InfoContainer>
-        <span>{duration}s</span>
-        <TypingProgress />
+        <TypingInfo duration={duration} />
       </InfoContainer>
       <WordsRenderer />
       <ResetButton />
