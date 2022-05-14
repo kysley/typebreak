@@ -24,6 +24,7 @@ export type WordState = {
   readonly modifier?: WordModifier;
   destroyed: boolean;
   frozen: boolean;
+  id: string;
 };
 export const wordsStateAtom = atomFamily({
   key: 'wordsState',

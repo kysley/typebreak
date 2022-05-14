@@ -35,7 +35,7 @@ export function arcadifyWords(words: string[]) {
   let wordsSinceLastModifier: number = 0;
   // let modNotAllowedFor: number = 0;
 
-  const wordState = words.map<WordState>((word, idx) => {
+  const wordState = words.map((word, idx): WordState => {
     let modifierType: ModifierTypes | null = null;
     const chance = Math.random();
 

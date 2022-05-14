@@ -60,6 +60,8 @@ export function ScoreDisplay() {
     >
       <animated.span>{props.val.to((val) => Math.floor(val))}</animated.span>
       {numberTransitions((styles, item) => (
+        //@todo
+        //@ts-expect-error idk what to do there
         <animated.div style={styles}>+{item.value}</animated.div>
       ))}
     </div>

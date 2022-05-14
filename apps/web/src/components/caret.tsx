@@ -2,7 +2,7 @@ import { RefObject, useLayoutEffect, useMemo } from 'react';
 import { animated } from 'react-spring';
 import { useSpring } from 'react-spring';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { currentLetterAtom, eolAtom } from '../state';
+import { currentLetterAtom, eolAtom, WordState } from '../state';
 import { styled } from '../stitches.conf';
 
 export const Caret = ({
@@ -13,7 +13,7 @@ export const Caret = ({
 }: {
   wordsRef: RefObject<HTMLDivElement>;
   index: number;
-  words: string[];
+  words: WordState[];
   breakAt?: number;
 }) => {
   const curLetter = useRecoilValue(currentLetterAtom);
@@ -40,7 +40,7 @@ export const Caret = ({
     const wordsDom = Array.from(wordsRef.current.children);
     const containerBounding = wordsRef.current.getBoundingClientRect();
 
-    const thisWord = wordsDom[index] as any;
+    const thisWord = wordsDom[index] as Element;
 
     const letters = Array.from(thisWord.children);
 
