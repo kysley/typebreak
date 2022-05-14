@@ -62,6 +62,11 @@ export const wordsStateAtCurrentIndex = selector<WordState>({
   },
 });
 
+export const wordsStateAtPreviousIndex = selector<WordState>({
+  key: 'wordsState/previousIndex',
+  get: ({ get }) => get(wordsStateAtom(get(indexAtom) - 1)),
+});
+
 export const indexAtom = atom({
   key: 'indexAtom',
   default: 0,
@@ -95,27 +100,40 @@ export const eolAtom = atom({
   default: false,
 });
 
-export const percentCompletedAtom = selector({
-  key: 'percentCompleted',
-  get: ({ get }) => Math.floor((get(indexAtom) / get(wordsAtom).length) * 100),
+export const ratioCompletedAtom = selector({
+  key: 'ratioCompleted',
+  get: ({ get }) => `${get(indexAtom)} / ${get(wordsAtom).length})`,
 });
 
-export const comboAtom = atom({
-  key: 'comboAtom',
-  default: 0,
-});
+// export const comboAtom = atom({
+//   key: 'comboAtom',
+//   default: 0,
+// });
 
-export const multiplierAtom = selector<number>({
+// export const multiplierAtom = selector<number>({
+//   key: 'multiplierAtom',
+//   get: ({ get }): number => {
+//     const combo = get(comboAtom);
+//     if (combo < COMBO_LIMIT) {
+//       return 1;
+//     }
+//     return Math.floor(combo / COMBO_LIMIT) + 1;
+//     // return Math.floor(get(comboAtom) / COMBO_LIMIT);
+//   },
+//   set: ({ set, reset }, newValue) => set(comboAtom, 0),
+// });
+export const multiplierAtom = atom<number>({
   key: 'multiplierAtom',
-  get: ({ get }): number => {
-    const combo = get(comboAtom);
-    if (combo < COMBO_LIMIT) {
-      return 1;
-    }
-    return Math.floor(combo / COMBO_LIMIT) + 1;
-    // return Math.floor(get(comboAtom) / COMBO_LIMIT);
-  },
-  set: ({ set, reset }, newValue) => set(comboAtom, 0),
+  default: 1,
+  // get: ({ get }): number => {
+  //   const combo = get(comboAtom);
+  //   if (combo < COMBO_LIMIT) {
+  //     return 1;
+  //   }
+  //   return Math.floor(combo / COMBO_LIMIT) + 1;
+  //   // return Math.floor(get(comboAtom) / COMBO_LIMIT);
+  // },
+  // set: ({ set, reset }, newValue) => set(comboAtom, 0),
 });
 
 export const scoreAtom = atom({
@@ -127,6 +145,16 @@ export const focusedAtom = atom({
   key: 'focusedAtom',
   default: 0,
 });
+
+// export const eslapsedState = selector({
+//   key: 'eslapsedState',
+//   get: ({ get }) => {
+//     const mode = get(timerTypeAtom);
+//     if (mode === 'INCREMENTAL') {
+//       return `${get(indexAtom)}/${get(wordsAtom).length}`;
+//     }
+//   },
+// });
 
 function calculateWPM({
   index,
