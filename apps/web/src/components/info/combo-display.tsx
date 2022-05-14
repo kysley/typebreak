@@ -1,22 +1,22 @@
 import { useEffect, useState } from 'react';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { ModifierTypes } from '../../modifiers';
 import { multiplierAtom, wordsStateAtPreviousIndex } from '../../state';
 import { styled } from '../../stitches.conf';
 
-const COMBO_PLACEHOLDER = Array.from({ length: 6 }, () => Math.random());
+const COMBO_PLACEHOLDER = Array.from({ length: 5 }, () => Math.random());
 
 export function ComboDisplay() {
-  const multiplier = useRecoilValue(multiplierAtom);
+  const [multiplier, setMultiplierState] = useRecoilState(multiplierAtom);
   const prevState = useRecoilValue(wordsStateAtPreviousIndex);
-  const setMultiplierState = useSetRecoilState(multiplierAtom);
 
-  const [chain, setChain] = useState<string[]>([]);
+  const [chain, setChain] = useState<(ModifierTypes | 'flawless')[]>([]);
 
   useEffect(() => {
     if (!prevState) return;
 
     if (prevState.flawless) {
-      setChain((prev) => [prevState.modifier?.type || 'flawless', ...prev]);
+      setChain((prev) => [...prev, prevState.modifier?.type || 'flawless']);
     }
   }, [prevState]);
 
@@ -63,7 +63,7 @@ export function ComboDisplay() {
       <div style={{ display: 'flex', gap: '5px' }}>
         {COMBO_PLACEHOLDER.map((id, idx) => (
           // <Dot key={id} filled={COMBO_LIMIT - relativeCombo > idx} />
-          <Dot key={id} filled={!!chain[idx]} />
+          <Dot key={id} color={chain[idx]} />
         ))}
       </div>
     </div>
@@ -76,9 +76,18 @@ const Dot = styled('div', {
   borderRadius: '50%',
   backgroundColor: '$sub',
   variants: {
-    filled: {
-      true: {
-        backgroundColor: '$caret',
+    color: {
+      flawless: {
+        backgroundColor: '$text',
+      },
+      CAMO: {
+        backgroundColor: 'green',
+      },
+      ICY: {
+        backgroundColor: 'blue',
+      },
+      MINE: {
+        backgroundColor: 'Gray',
       },
     },
   },
