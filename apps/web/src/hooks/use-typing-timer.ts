@@ -23,5 +23,5 @@ export function useTypingTimer() {
     }
   }, [reset, start, userTypingState]);
 
-  return time;
+  return { time, state: userTypingState };
 }

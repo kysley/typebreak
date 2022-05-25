@@ -1,7 +1,7 @@
-import { styled } from '../stitches.conf';
-import { ComboDisplay } from './info/combo-display';
-import { EslapsedDisplay } from './info/eslapsed-display';
-import { ScoreDisplay } from './info/score-display';
+import { styled } from '../../stitches.conf';
+import { ComboDisplay } from './combo-display';
+import { EslapsedDisplay } from './eslapsed-display';
+import { ScoreDisplay } from './score-display';
 
 export const TypingInfo = ({ duration }: { duration: number }) => {
   return (

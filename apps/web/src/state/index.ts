@@ -5,15 +5,16 @@ import {
   selector,
   selectorFamily,
 } from 'recoil';
-import { getWords } from 'wordkit';
-import { arcadifyWords } from '../hooks/use-arcade-mode';
+import { Seed } from 'wordkit';
 import { WordModifier } from '../modifiers';
 
-export const COMBO_LIMIT = 22;
-
-export const wordsAtom = atom({
+// export const wordsAtom = atom({
+//   key: 'wordsAtom',
+//   default: arcadifyWords(getWords(50).split(',')),
+// });
+export const wordsAtom = atom<WordState[]>({
   key: 'wordsAtom',
-  default: arcadifyWords(getWords(50).split(',')),
+  default: [],
 });
 
 export type WordState = {
@@ -106,35 +107,14 @@ export const ratioCompletedAtom = selector({
   get: ({ get }) => `${get(indexAtom)} / ${get(wordsAtom).length})`,
 });
 
-// export const comboAtom = atom({
-//   key: 'comboAtom',
-//   default: 0,
-// });
+export const seedState = atom({
+  key: 'seed',
+  default: new Seed()._seed,
+});
 
-// export const multiplierAtom = selector<number>({
-//   key: 'multiplierAtom',
-//   get: ({ get }): number => {
-//     const combo = get(comboAtom);
-//     if (combo < COMBO_LIMIT) {
-//       return 1;
-//     }
-//     return Math.floor(combo / COMBO_LIMIT) + 1;
-//     // return Math.floor(get(comboAtom) / COMBO_LIMIT);
-//   },
-//   set: ({ set, reset }, newValue) => set(comboAtom, 0),
-// });
 export const multiplierAtom = atom<number>({
   key: 'multiplierAtom',
   default: 1,
-  // get: ({ get }): number => {
-  //   const combo = get(comboAtom);
-  //   if (combo < COMBO_LIMIT) {
-  //     return 1;
-  //   }
-  //   return Math.floor(combo / COMBO_LIMIT) + 1;
-  //   // return Math.floor(get(comboAtom) / COMBO_LIMIT);
-  // },
-  // set: ({ set, reset }, newValue) => set(comboAtom, 0),
 });
 
 export const scoreAtom = atom({

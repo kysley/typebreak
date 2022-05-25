@@ -1,19 +1,33 @@
 import { WordsRenderer } from './components/words-renderer';
 import './App.css';
-import { TypingInfo } from './components/typing-info';
+import { TypingInfo } from './components/info/typing-info';
 import { styled } from './stitches.conf';
 import { useArcadeMode } from './hooks/use-arcade-mode';
 import { useTypingTimer } from './hooks/use-typing-timer';
+import { TypingResults } from './components/typing-results';
+import { useEffect } from 'react';
 
 function App() {
-  const duration = useTypingTimer();
+  const { time, state } = useTypingTimer();
+  const { reset } = useArcadeMode();
+
+  useEffect(() => {
+    reset();
+  }, [reset]);
+
   return (
     <div className='App container'>
-      <InfoContainer>
-        <TypingInfo duration={duration} />
-      </InfoContainer>
-      <WordsRenderer />
-      <ResetButton />
+      {state !== 'DONE' ? (
+        <>
+          <InfoContainer>
+            <TypingInfo duration={time} />
+          </InfoContainer>
+          <WordsRenderer />
+          <ResetButton />
+        </>
+      ) : (
+        <TypingResults time={time} />
+      )}
     </div>
   );
 }

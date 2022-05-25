@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useRefocus } from '../hooks/use-refocus';
 import { focusedAtom, indexAtom, wordsAtom } from '../state';
@@ -6,7 +6,7 @@ import { Caret } from './caret';
 import { HiddenInput } from './hidden-input';
 import { Word } from './word';
 
-export const WordsRenderer = () => {
+export const WordsRenderer = memo(() => {
   const words = useRecoilValue(wordsAtom);
   const inputRef = useRef<HTMLInputElement>(null);
   const index = useRecoilValue(indexAtom);
@@ -94,4 +94,4 @@ export const WordsRenderer = () => {
       )}
     </div>
   );
-};
+});

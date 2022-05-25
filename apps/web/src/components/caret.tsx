@@ -1,6 +1,5 @@
 import { RefObject, useLayoutEffect, useMemo } from 'react';
-import { animated } from 'react-spring';
-import { useSpring } from 'react-spring';
+import { animated, useSpring, easings } from 'react-spring';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { currentLetterAtom, eolAtom, WordState } from '../state';
 import { styled } from '../stitches.conf';
@@ -20,7 +19,10 @@ export const Caret = ({
   const setEol = useSetRecoilState(eolAtom);
   const [caretPos, setCaretPos] = useSpring(() => ({
     transform: 'translate(0,0)',
-    config: { duration: 55, friction: 5, precision: 1 },
+    config: {
+      duration: 200,
+      easing: easings.easeOutCubic,
+    },
   }));
 
   const horizontalSpaceBetweenWords = useMemo(

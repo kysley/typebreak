@@ -62,7 +62,6 @@ export function ComboDisplay() {
       <span>{multiplier}x</span>
       <div style={{ display: 'flex', gap: '5px' }}>
         {COMBO_PLACEHOLDER.map((id, idx) => (
-          // <Dot key={id} filled={COMBO_LIMIT - relativeCombo > idx} />
           <Dot key={id} color={chain[idx]} />
         ))}
       </div>
