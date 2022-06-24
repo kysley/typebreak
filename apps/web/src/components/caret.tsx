@@ -8,12 +8,14 @@ export const Caret = ({
   index,
   words,
   wordsRef,
-  breakAt,
+  secondLineTop,
+  line,
 }: {
   wordsRef: RefObject<HTMLDivElement>;
   index: number;
   words: WordState[];
-  breakAt?: number;
+  secondLineTop: number;
+  line: 1 | 2;
 }) => {
   const curLetter = useRecoilValue(currentLetterAtom);
   const setEol = useSetRecoilState(eolAtom);
@@ -33,6 +35,8 @@ export const Caret = ({
       ),
     [wordsRef],
   );
+
+  useLayoutEffect(() => {}, []);
 
   // Handle the caret position
   useLayoutEffect(() => {
@@ -66,9 +70,9 @@ export const Caret = ({
     setEol(isEol);
 
     setCaretPos({
-      transform: `translate(${letterBounding[dir]}px, ${
-        letterBounding.bottom - letterBounding.height
-      }px)`,
+      transform: `translate(${
+        letterBounding[dir] - containerBounding.left
+      }px, ${line === 1 ? -4 : secondLineTop - containerBounding.top}px)`,
     });
   }, [
     curLetter,
@@ -77,7 +81,9 @@ export const Caret = ({
     setCaretPos,
     words,
     wordsRef,
-    breakAt,
+    setEol,
+    line,
+    secondLineTop,
   ]);
 
   return <StyledCaret style={caretPos} />;
