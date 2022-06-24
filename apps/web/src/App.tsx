@@ -2,14 +2,14 @@ import { WordsRenderer } from './components/words-renderer';
 import './App.css';
 import { TypingInfo } from './components/info/typing-info';
 import { styled } from './stitches.conf';
-import { useArcadeMode } from './hooks/use-arcade-mode';
 import { useTypingTimer } from './hooks/use-typing-timer';
 import { TypingResults } from './components/typing-results';
 import { useEffect } from 'react';
+import { useWords } from './hooks/use-words';
 
 function App() {
   const { time, state } = useTypingTimer();
-  const { reset } = useArcadeMode();
+  const { reset } = useWords();
 
   useEffect(() => {
     reset();
@@ -33,7 +33,7 @@ function App() {
 }
 
 function ResetButton() {
-  const { reset } = useArcadeMode();
+  const { reset } = useWords();
   return (
     <button onClick={reset} tabIndex={0}>
       reset

@@ -12,29 +12,69 @@ import { useCallback } from 'react';
 import { useResetWordsState } from './use-reset-words-state';
 import { useSetRecoilState } from 'recoil';
 
-export function useArcadeMode() {
+export function useWords(mode: 'normal' | 'arcade' = 'normal') {
   const { resetWordsState } = useResetWordsState();
   const setSeed = useSetRecoilState(seedState);
 
   const reset = useCallback(() => {
-    const sdr = new Seed({ seed: 'poop' });
+    const sdr = new Seed();
     const words = getWords(100, sdr).split(',');
-    setSeed(sdr.providedSeed || sdr._seed);
-    const arcadeWords = arcadifyWords(words, sdr);
 
-    resetWordsState(arcadeWords);
-  }, [resetWordsState, setSeed]);
+    let hydratedWords: WordState[] = [];
+
+    if (mode === 'arcade') {
+      hydratedWords = arcadifyWords(words, sdr);
+    } else {
+      hydratedWords = hydrateWords(words);
+    }
+
+    setSeed(sdr.providedSeed || sdr._seed);
+    resetWordsState(hydratedWords);
+  }, [mode]);
 
   return {
     reset,
   };
 }
 
+// export function useArcadeMode() {
+//   const { resetWordsState } = useResetWordsState();
+//   const setSeed = useSetRecoilState(seedState);
+
+//   const reset = useCallback(() => {
+//     const sdr = new Seed();
+//     const words = getWords(100, sdr).split(',');
+//     setSeed(sdr.providedSeed || sdr._seed);
+//     // const arcadeWords = arcadifyWords(words, sdr);
+
+//     resetWordsState(arcadeWords);
+//   }, [resetWordsState, setSeed]);
+
+//   return {
+//     reset,
+//   };
+// }
+
 const modifierFactoryMap: Record<ModifierTypes, () => WordModifier> = {
   MINE: mineModifierFactory,
   ICY: icyWordFactory,
   CAMO: camoWordFactory,
 };
+
+export function hydrateWords(words: string[]) {
+  return words.map(
+    (word): WordState => ({
+      destroyed: false,
+      flawless: false,
+      frozen: false,
+      input: '',
+      name: word,
+      perfect: null,
+      modifier: undefined,
+      id: uuidv4(),
+    }),
+  );
+}
 
 export function arcadifyWords(words: string[], gen: Seed) {
   let wordsSinceLastModifier: number = 0;

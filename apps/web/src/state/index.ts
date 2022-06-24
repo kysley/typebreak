@@ -12,6 +12,12 @@ import { WordModifier } from '../modifiers';
 //   key: 'wordsAtom',
 //   default: arcadifyWords(getWords(50).split(',')),
 // });
+
+export const seedAtom = atom<Seed>({
+  key: 'seedAtom',
+  default: new Seed(),
+});
+
 export const wordsAtom = atom<WordState[]>({
   key: 'wordsAtom',
   default: [],
@@ -83,7 +89,7 @@ export const currentLetterAtom = selector({
 
 export const timerTypeAtom = atom<'INCREMENTAL' | 'DECREMENTAL'>({
   key: 'timertype',
-  default: 'DECREMENTAL',
+  default: 'INCREMENTAL',
 });
 
 export type TypingState = 'IDLE' | 'STARTED' | 'DONE';
@@ -159,5 +165,7 @@ function calculateWPM({
     }
   }
   const wpm = Math.round(((correctWords + index) * (60 / time)) / 5);
+  const acc = incorrectWords / correctWords;
+  console.log(acc);
   return wpm;
 }
