@@ -13,10 +13,10 @@ import { WordModifier } from '../modifiers';
 //   default: arcadifyWords(getWords(50).split(',')),
 // });
 
-export const seedAtom = atom<Seed>({
-  key: 'seedAtom',
-  default: new Seed(),
-});
+// export const seedAtom = atom<Seed>({
+//   key: 'seedAtom',
+//   default: new Seed(),
+// });
 
 export const wordsAtom = atom<WordState[]>({
   key: 'wordsAtom',
@@ -89,7 +89,7 @@ export const currentLetterAtom = selector({
 
 export const timerTypeAtom = atom<'INCREMENTAL' | 'DECREMENTAL'>({
   key: 'timertype',
-  default: 'INCREMENTAL',
+  default: 'DECREMENTAL',
 });
 
 export type TypingState = 'IDLE' | 'STARTED' | 'DONE';
@@ -110,7 +110,7 @@ export const eolAtom = atom({
 
 export const ratioCompletedAtom = selector({
   key: 'ratioCompleted',
-  get: ({ get }) => `${get(indexAtom)} / ${get(wordsAtom).length})`,
+  get: ({ get }) => `${get(indexAtom)} / ${get(wordsAtom).length}`,
 });
 
 export const seedState = atom({
@@ -143,29 +143,44 @@ export const focusedAtom = atom({
 //   },
 // });
 
-function calculateWPM({
+export function calculateWPM({
   index,
   time,
   wordsState,
+  mistakes,
 }: {
   index: number;
   time: number;
   wordsState: WordState[];
+  mistakes: number;
 }) {
-  let correctWords = 0;
-  let incorrectWords = 0;
+  let correctLetters = 0;
+  let incorrectLetters = 0;
 
   for (let i = 0; i <= index; i++) {
     const word = wordsState[i];
-    if (word.perfect) correctWords += word.name.length;
+    if (!word) break;
+    if (word.perfect) correctLetters += word.name.length;
     else {
-      incorrectWords += word.name
-        .split('')
-        .findIndex((letter, index) => word.input[index] !== letter);
+      word.name.split('').forEach((letter, index) => {
+        if (word.input[index]) {
+          if (word.input[index] === letter) {
+            correctLetters += 1;
+          } else if (
+            index < word.input.length - 1 &&
+            word.input[index] !== letter
+          ) {
+            incorrectLetters += 1;
+          }
+        }
+      });
     }
   }
-  const wpm = Math.round(((correctWords + index) * (60 / time)) / 5);
-  const acc = incorrectWords / correctWords;
+  const wpm = Math.round(((correctLetters + index) * (60 / time)) / 5);
+  const total = correctLetters + index + incorrectLetters + mistakes;
+  const acc = (1 - (incorrectLetters + mistakes) / total) * 100;
+
   console.log(acc);
-  return wpm;
+
+  return { wpm, acc };
 }

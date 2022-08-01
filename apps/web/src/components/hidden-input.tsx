@@ -80,6 +80,7 @@ export const HiddenInput = forwardRef((props, ref: any) => {
             newWordState.input = '';
           } else {
             console.log('backspacing normal');
+            set(mistakesAtom, (prev) => (prev += 1));
 
             newWordState.input = newWordState.input.substring(
               0,
