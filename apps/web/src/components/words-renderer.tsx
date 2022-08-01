@@ -83,8 +83,6 @@ export const WordsRenderer = memo(() => {
                   key={`${word.id}-${idx}`}
                   show={idx <= index}
                   hidden={timesBroken >= 2 && idx < hideUnder}
-                  // if the line has broke at least 3 times
-                  // get the current line break index, subtract the prev index (N - (N-1))
                 />
               ))}
             </div>

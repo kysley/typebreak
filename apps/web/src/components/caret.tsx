@@ -72,7 +72,7 @@ export const Caret = ({
     setCaretPos({
       transform: `translate(${
         letterBounding[dir] - containerBounding.left
-      }px, ${line === 1 ? -4 : secondLineTop - containerBounding.top}px)`,
+      }px, ${line === 1 ? -4 : secondLineTop / 2.3}px)`,
     });
   }, [
     curLetter,

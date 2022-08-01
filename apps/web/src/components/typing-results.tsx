@@ -17,7 +17,11 @@ export function TypingResults({ time }: { time: number }) {
         <Box css={{ flexDirection: 'row', display: 'flex', gap: '3rem' }}>
           <ResultItem title={'wpm'} content={90} size='lg' />
           <ResultItem title={'Words typed'} content={index} />
-          <ResultItem icon={Backspace} title={'Mistakes'} content={mistakes} />
+          <ResultItem
+            icon={<Backspace />}
+            title={'Mistakes'}
+            content={mistakes}
+          />
         </Box>
         <Box css={{ flexDirection: 'row', display: 'flex', gap: '3rem' }}>
           <ResultItem
@@ -50,7 +54,7 @@ const ResultsGrid = styled('div', {
 export const ResultItem: VFC<
   { title: string; content: ReactNode } & Stitches.CSS &
     Stitches.VariantProps<typeof StyledResultContent>
-> = ({ title, content, size = 'md', icon: Icon, ...rest }) => {
+> = ({ title, content, size = 'md', icon, ...rest }) => {
   return (
     <Box
       css={{
@@ -69,8 +73,10 @@ export const ResultItem: VFC<
           gap: '0.5rem',
         }}
       >
-        {Icon && <Icon />}
-        <StyledResultTitle>{title}</StyledResultTitle>
+        <>
+          {icon}
+          <StyledResultTitle>{title}</StyledResultTitle>
+        </>
       </Box>
       <StyledResultContent size={size}>{content}</StyledResultContent>
     </Box>
