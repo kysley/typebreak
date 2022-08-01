@@ -23,5 +23,8 @@ export function useTypingTimer() {
     }
   }, [reset, start, userTypingState]);
 
-  return { time, state: userTypingState };
+  return {
+    time: timer === 'INCREMENTAL' ? time : 60 - time,
+    state: userTypingState,
+  };
 }
