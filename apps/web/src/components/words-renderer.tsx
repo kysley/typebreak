@@ -14,109 +14,60 @@ export const WordsRenderer = memo(() => {
 
   const focusTrigger = useRecoilValue(focusedAtom);
 
-  const refocus = useRefocus();
-
-  const [lineBreakIndex, setLineBreakIndex] = useState<number | null>(null);
-  const [timesBroke, setTimesBroke] = useState(0);
-  const [lineState, setLineState] = useState(0);
-  const [lastBreak, setLastBreak] = useState(0);
-  // firstBreak, setFirstBreak. Used as an offset index for hiding words
-  const [fb, sfb] = useState(null);
-
-  // TODO: send line back to 1 if previous
-  const [onPrevLine, setOnPrevLine] = useState(false);
+  const [offsets, setOffsets] = useState<number[]>([]);
+  const [breaks, setBreaks] = useState<number[]>([]);
+  const [timesBroken, setTimesBroken] = useState(0);
+  const [hideUnder, setHideUnder] = useState(0);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, [focusTrigger]);
 
-  useEffect(() => {
-    if (!wordsRef.current) return;
+  useLayoutEffect(() => {
+    if (wordsRef.current) {
+      const words = Array.from(wordsRef.current.children) as HTMLDivElement[];
 
-    const words = Array.from(wordsRef.current.children);
+      const _breaks: number[] = [];
+      const _offsets: number[] = [];
 
-    let nextLineIndex = 0;
-    let prevTop = null;
+      let prevTop = 0;
+      for (let i = hideUnder; i <= words.length - 1; ++i) {
+        const offsetTop = words[i].offsetTop;
 
-    console.log({ lineBreakIndex, timesBroke });
+        if (offsetTop !== prevTop) {
+          prevTop = offsetTop;
+          _breaks.push(i);
+          _offsets.push(offsetTop);
+        }
 
-    for (let idx = index; idx <= words.length - 1; idx++) {
-      const word = words[idx];
-
-      // if (idx < index) return;
-      const top = word.getBoundingClientRect().top;
-      if (prevTop === null) {
-        prevTop = top;
-      } else if (prevTop !== top) {
-        // console.log({ prevTop, top, idx });
-
-        nextLineIndex = idx;
-        break;
+        // handle case when 1 break left?
+        if (_breaks.length === 3) {
+          break;
+        }
       }
-      prevTop = top;
-    }
-    if (lineState === 0) {
-      setLineState(words[nextLineIndex].getBoundingClientRect().top);
-    }
 
-    setLineBreakIndex(nextLineIndex);
-  }, [index, lineBreakIndex, lineState, timesBroke]);
+      setBreaks(_breaks);
+      setOffsets(_offsets);
+    }
+  }, [index]);
 
   useEffect(() => {
-    if (lineBreakIndex && index >= lineBreakIndex) {
-      console.log('broke');
-      setTimesBroke((prev) => (prev += 1));
-      setLastBreak(lineBreakIndex);
+    let pastBreak = false;
+    if (timesBroken === 0) {
+      pastBreak = index >= breaks[0];
+    } else {
+      pastBreak = index >= breaks[1];
+      if (pastBreak) setHideUnder(breaks[0]);
     }
-  }, [index, lineBreakIndex]);
-
-  useEffect(() => {
-    // if we havent set the first break index yet.. do that
-    if (!fb) {
-      sfb(lastBreak);
+    if (pastBreak) {
+      setTimesBroken((prev) => (prev += 1));
     }
-  }, [fb, index, lastBreak]);
+  }, [index]);
 
-  // // todo: fix edge case where you break again at the last broken index
-  // // this happens when you backspace to the previous line to fix a word
-  // useEffect(() => {
-  //   if (breakAt) {
-  //     if (index >= breakAt) {
-  //       console.log({ lastBreakIndex, breakAt, breakIndex });
-  //       // if (lastBreakIndex !== breakAt) {
-  //       setTimesBroke((prev) => (prev += 1));
-  //       // }
-  //       setLastBreakIndex(breakIndex || breakAt);
-  //       setbreakIndex(breakAt);
-  //     }
-  //   }
-  // }, [breakAt, breakIndex, index, lastBreakIndex, setbreakIndex]);
+  const line = breaks.length ? (index >= breaks[0] ? 2 : 1) : 1;
+  // console.log({ index, breaks, line, timesBroken, hideUnder });
 
-  // // handle line break
-  // useLayoutEffect(() => {
-  //   if (!wordsRef.current) return;
-  //   const words = Array.from(wordsRef.current.children);
-
-  //   let nextLineBreak: number | null = null;
-  //   let prevTop = null;
-  //   for (let idx = index; idx <= words.length - 1; idx++) {
-  //     const word = words[idx];
-
-  //     // if (idx < index) return;
-  //     const top = word.getBoundingClientRect().top;
-  //     if (prevTop === null) {
-  //       prevTop = top;
-  //     } else if (prevTop !== top) {
-  //       // console.log({ prevTop, top, idx });
-
-  //       nextLineBreak = idx;
-  //       break;
-  //     }
-  //     prevTop = top;
-  //   }
-  //   console.log(nextLineBreak);
-  //   if (nextLineBreak) setBreak(nextLineBreak);
-  // }, [index]);
+  const refocus = useRefocus();
 
   return (
     <div style={{ position: 'relative' }}>
@@ -124,17 +75,16 @@ export const WordsRenderer = memo(() => {
 
       {words.length && (
         <>
-          <div className='wrapper'>
+          <div className='wrapper' style={{ position: 'relative' }}>
             <div ref={wordsRef} id='dev' onClick={() => refocus()}>
               {words.map((word, idx) => (
                 <Word
                   myIndex={idx}
                   key={`${word.id}-${idx}`}
                   show={idx <= index}
-                  hidden={timesBroke > 1 && lastBreak - (fb || 0) > idx}
-                  // should be on the second line, subtract the last break index by the first break
-                  // this will hide the # of words on the previous line
-                  // FIX: we have some weird "off by 1-3 errors here"
+                  hidden={timesBroken >= 2 && idx < hideUnder}
+                  // if the line has broke at least 3 times
+                  // get the current line break index, subtract the prev index (N - (N-1))
                 />
               ))}
             </div>
@@ -143,12 +93,8 @@ export const WordsRenderer = memo(() => {
             wordsRef={wordsRef}
             index={index}
             words={words}
-            secondLineTop={lineState}
-            line={
-              lineBreakIndex === null || lineBreakIndex === 0 || timesBroke < 1
-                ? 1
-                : 2
-            }
+            secondLineTop={offsets[1] || 0}
+            line={line}
           />
         </>
       )}
