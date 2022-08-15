@@ -1,7 +1,7 @@
 import type * as Stitches from '@stitches/react';
 import { ReactNode, VFC } from 'react';
 import { useRecoilValue } from 'recoil';
-import { Backspace } from 'tabler-icons-react';
+import { useWPM } from '../hooks/use-wpm';
 import { indexAtom, mistakesAtom, multiplierAtom, scoreAtom } from '../state';
 import { styled } from '../stitches.conf';
 
@@ -10,20 +10,23 @@ export function TypingResults({ time }: { time: number }) {
   const mistakes = useRecoilValue(mistakesAtom);
   const score = useRecoilValue(scoreAtom);
   const multi = useRecoilValue(multiplierAtom);
+  const wpm = useWPM(60);
 
   return (
     <div id='dev'>
       <ResultsGrid>
-        <Box css={{ flexDirection: 'row', display: 'flex', gap: '3rem' }}>
-          <ResultItem title={'wpm'} content={90} size='lg' />
+        <Box css={{ flexDirection: 'row', display: 'flex', gap: '64px' }}>
           <ResultItem title={'Words typed'} content={index} />
+          <ResultItem title={'Mistakes'} content={mistakes} />
           <ResultItem
-            icon={<Backspace />}
-            title={'Mistakes'}
-            content={mistakes}
+            title={'Multiplier'}
+            content={multi}
+            size='sm'
+            gridRow={2}
           />
         </Box>
-        <Box css={{ flexDirection: 'row', display: 'flex', gap: '3rem' }}>
+        <Box css={{ flexDirection: 'row', display: 'flex', gap: '48px' }}>
+          <ResultItem title={'wpm'} content={wpm} size='lg' />
           <ResultItem
             title={'Score'}
             content={score}
@@ -31,12 +34,10 @@ export function TypingResults({ time }: { time: number }) {
             gridRow={2}
             gridColumn='1 / span 3'
           />
-          <ResultItem
-            title={'Multiplier'}
-            content={multi}
-            size='sm'
-            gridRow={2}
-          />
+        </Box>
+        <Box>
+          <button>retry</button>
+          <button>next</button>
         </Box>
       </ResultsGrid>
     </div>
@@ -46,7 +47,7 @@ export function TypingResults({ time }: { time: number }) {
 const ResultsGrid = styled('div', {
   display: 'grid !important',
   // gridTemplateColumns: 'repeat(10, auto)',
-  gap: '1.5rem 3rem',
+  gap: '24px 24px',
   color: 'white',
   width: '100%',
 });
@@ -62,7 +63,7 @@ export const ResultItem: VFC<
         display: 'flex',
         // background: '$text',
         // color: '$background',
-        padding: '1rem',
+        // padding: '1rem',
         borderRadius: '2px',
         ...rest,
       }}
@@ -91,6 +92,7 @@ const StyledResultTitle = styled('h3', {
 const StyledResultContent = styled('h3', {
   margin: 0,
   fontSize: '6rem',
+  lineHeight: 1,
   variants: {
     size: {
       sm: {

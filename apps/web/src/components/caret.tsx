@@ -71,7 +71,7 @@ export const Caret = ({
 
     setCaretPos({
       transform: `translate(${
-        letterBounding[dir] - containerBounding.left
+        letterBounding[dir] - containerBounding.left - 2 || 0
       }px, ${line === 1 ? -4 : secondLineTop / 2.3}px)`,
     });
   }, [

@@ -11,7 +11,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   height: 100vh;
   max-width: 100vw;
-  background-color: #272822;
+  background-color: #242424;
 }
 
 code {
@@ -23,8 +23,8 @@ code {
   display: flex;
   gap: 0.6rem 0.8rem;
   /* width: 80%; */
-  width: 70vw;
-  max-width: 925px;
+  /* width: 70vw; */
+  /* max-width: 925px; */
   flex-wrap: wrap;
   /* background: #00000015; */
   position: relative;

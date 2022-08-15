@@ -24,3 +24,14 @@ export const {
     bp1: '(min-width: 480px)',
   },
 });
+
+export const terminal = createTheme('terminal', {
+  colors: {
+    background: '#191a1b',
+    caret: '#79a617',
+    text: '#e7eae0',
+    sub: '#48494b',
+    error: '#a61717',
+    extra: '#731010',
+  },
+});

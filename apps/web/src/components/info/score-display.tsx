@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { animated, useSpring, useTransition } from 'react-spring';
 import { useRecoilValue } from 'recoil';
+import { Numbers } from 'tabler-icons-react';
 import { v4 } from 'uuid';
 import { scoreAtom } from '../../state';
 
@@ -52,10 +53,12 @@ export function ScoreDisplay() {
     <div
       style={{
         display: 'flex',
-        justifyContent: 'right',
+        alignItems: 'flex-end',
         fontWeight: 600,
         fontSize: '1.2rem',
         position: 'relative',
+        flexDirection: 'column',
+        lineHeight: 1,
       }}
     >
       <animated.span>{props.val.to((val) => Math.floor(val))}</animated.span>
@@ -64,6 +67,16 @@ export function ScoreDisplay() {
         //@ts-expect-error idk what to do there
         <animated.div style={styles}>+{item.value}</animated.div>
       ))}
+      <span
+        style={{
+          textTransform: 'uppercase',
+          fontSize: '15px',
+          fontWeight: 'bold',
+        }}
+      >
+        score
+      </span>
+      {/* <Numbers /> */}
     </div>
   );
 }

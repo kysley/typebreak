@@ -19,5 +19,5 @@ const Container = styled('div', {
   gridTemplateColumns: '1fr 1fr 1fr',
   justifyContent: 'space-between',
   width: '100%',
-  alignItems: 'center',
+  alignItems: 'flex-end',
 });

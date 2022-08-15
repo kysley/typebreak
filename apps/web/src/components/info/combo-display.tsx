@@ -55,8 +55,9 @@ export function ComboDisplay() {
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        fontSize: '1.35rem',
+        fontSize: '1.55rem',
         gap: '10px',
+        lineHeight: 1,
       }}
     >
       <span>{multiplier}x</span>
@@ -70,9 +71,9 @@ export function ComboDisplay() {
 }
 
 const Dot = styled('div', {
-  height: 5,
-  width: 5,
-  borderRadius: '50%',
+  height: 3,
+  width: 10,
+  // borderRadius: '50%',
   backgroundColor: '$sub',
   variants: {
     color: {
