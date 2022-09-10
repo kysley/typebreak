@@ -36,8 +36,8 @@ export function TypingResults({ time }: { time: number }) {
           />
         </Box>
         <Box>
-          <button>retry</button>
-          <button>next</button>
+          <button>retry test</button>
+          <button>new test</button>
         </Box>
       </ResultsGrid>
     </div>

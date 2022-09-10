@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil';
-import { Bolt, Clock, Gauge, HourglassHigh } from 'tabler-icons-react';
+import { Gauge, HourglassHigh } from 'tabler-icons-react';
 import { useWPM } from '../../hooks/use-wpm';
 import { timerTypeAtom, ratioCompletedAtom } from '../../state';
 import { styled } from '../../stitches.conf';
@@ -12,11 +12,11 @@ export const EslapsedDisplay = ({ duration }: { duration: number }) => {
   return (
     <Container>
       <Wrapper>
-        <HourglassHigh />
+        <HourglassHigh size='20' />
         <Text>{mode === 'INCREMENTAL' ? ratio : `${duration}s`}</Text>
       </Wrapper>
       <Wrapper>
-        <Gauge />
+        <Gauge size='20' />
         <Text>{wpm || 0}</Text>
       </Wrapper>
     </Container>

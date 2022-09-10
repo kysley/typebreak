@@ -1,9 +1,9 @@
 import { WordsRenderer } from './components/words-renderer';
 import './App.css';
 import { TypingInfo } from './components/info/typing-info';
-import { styled, terminal } from './stitches.conf';
+import { keyframes, light, styled, terminal } from './stitches.conf';
 import { useTypingTimer } from './hooks/use-typing-timer';
-import { TypingResults } from './components/typing-results';
+import { Box, TypingResults } from './components/typing-results';
 import { useEffect } from 'react';
 import { useWords } from './hooks/use-words';
 import { Refresh } from 'tabler-icons-react';
@@ -17,21 +17,21 @@ function App() {
   }, [reset]);
 
   return (
-    <div className={`App container ${terminal}`}>
-      <GameContainer>
-        {state !== 'DONE' ? (
-          <>
-            <InfoContainer>
-              <TypingInfo duration={time} />
-            </InfoContainer>
+    <Wrapper className={`App container ${light}`}>
+      {state !== 'DONE' ? (
+        <>
+          <InfoContainer detached={state === 'STARTED'}>
+            <TypingInfo duration={time} />
+          </InfoContainer>
+          <GameContainer detached={state === 'STARTED'}>
             <WordsRenderer />
-            <ResetButton opaque={state === 'STARTED'} />
-          </>
-        ) : (
-          <TypingResults time={time} />
-        )}
-      </GameContainer>
-    </div>
+          </GameContainer>
+          <ResetButton opaque={state === 'STARTED'} />
+        </>
+      ) : (
+        <TypingResults time={time} />
+      )}
+    </Wrapper>
   );
 }
 
@@ -65,25 +65,69 @@ const StyledResetButton = styled('button', {
   },
 });
 
+const InfoDetachKeyframes = keyframes({
+  '0%': {
+    transform: 'translateY(0)',
+  },
+  '50%': {
+    transform: 'translateY(-0.75rem)',
+  },
+  '80%': {
+    transform: 'translateY(-.47rem)',
+  },
+  '100%': {
+    transform: 'translateY(-.5rem)',
+  },
+});
+
 const InfoContainer = styled('div', {
   color: '$text',
   display: 'flex',
-  // width: '925px',
-  // marginBottom: '1em',
-  // justifyContent: 'flex-start',
+  maxWidth: '1075px',
+  width: '100%',
+  background: '$background2',
+  borderRadius: '3vh 3vh 0 0',
+  // height: '50px',
+  alignItems: 'center',
+  padding: '.5rem 1rem',
+  transition: 'all .1s',
+
+  variants: {
+    detached: {
+      true: {
+        animation: `${InfoDetachKeyframes} .3s`,
+        // transform: 'translateY(-0.5rem)',
+        borderRadius: '3vh',
+        transform: 'translateY(-.5rem)',
+      },
+    },
+  },
 });
 
 const GameContainer = styled('div', {
-  background: '$background',
-  // padding: '56px 96px',
-  borderRadius: '9px',
+  background: '$background3',
+  borderRadius: '0 0 3vh 3vh',
   maxWidth: '1075px',
-  // height: '70vh',
   display: 'flex',
   justifyContent: 'center',
   flexDirection: 'column',
-  padding: '25px',
+  padding: '20px',
   gap: '15px',
+  transition: 'margin .5s, border-radius .1s ',
+
+  variants: {
+    detached: {
+      true: {
+        // marginTop: '.5rem',
+        borderRadius: '3vh',
+        // marginBottom: '.5rem',
+      },
+    },
+  },
+});
+
+const Wrapper = styled('main', {
+  backgroundColor: '$background',
 });
 
 export default App;

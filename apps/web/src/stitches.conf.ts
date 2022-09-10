@@ -35,3 +35,16 @@ export const terminal = createTheme('terminal', {
     extra: '#731010',
   },
 });
+
+export const light = createTheme('light', {
+  colors: {
+    background: '#f5f5f7',
+    background2: '#dfdfdf',
+    background3: '#dad7d0',
+    caret: '#d73a49',
+    text: '#0000ff',
+    sub: '#000000',
+    error: '#a31515',
+    extra: '#008000',
+  },
+});
