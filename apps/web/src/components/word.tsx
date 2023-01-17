@@ -2,28 +2,34 @@ import { useRecoilValue } from 'recoil';
 import { wordsStateAtom } from '../state';
 import { memo } from 'react';
 import { styled } from '../stitches.conf';
+import { AllSlices, useStore, WordStatus, WordState } from '../state/words-slice';
 
 type WordProps = {
-  myIndex: number;
+  word: WordState;
   hidden: boolean;
   show: boolean;
 };
-function WordComponent({ myIndex, hidden, show }: WordProps) {
-  const word = useRecoilValue(wordsStateAtom(myIndex));
+
+function WordComponent({ word, hidden, show }: WordProps) {
+  // const word = useRecoilValue(wordsStateAtom(myIndex));
+  // const {word} = useStore((state) => ({
+  //   word: state.wordsState[myIndex]
+  // }))
+
   const inputLength = word.input.length - 1;
 
   return (
     <StyledWord
       flawless={word.flawless}
       // perfect={(!word.flawless && word.perfect) || false}
-      incorrect={!word.perfect && word.perfect !== null}
-      destroyed={word.destroyed}
-      frozen={word.frozen}
+      incorrect={!word.perfect && word.perfect !== undefined}
+      destroyed={word.status === WordStatus.DESTROYED}
+      frozen={word.status === WordStatus.FROZEN}
       hidden={hidden}
       mine={word.modifier?.type === 'MINE'}
       camo={!show && word.modifier?.type === 'CAMO'}
     >
-      {word.name.split('').map((letter, idx) => {
+      {word.word.split('').map((letter, idx) => {
         const notYetTyped = inputLength >= idx;
         return (
           <StyledLetter
@@ -35,10 +41,10 @@ function WordComponent({ myIndex, hidden, show }: WordProps) {
           </StyledLetter>
         );
       })}
-      {word.input.length > word.name.length && (
+      {word.input.length > word.word.length && (
         <>
           {word.input
-            .substring(word.name.length)
+            .substring(word.word.length)
             .split('')
             .map((letter, idx) => {
               return (

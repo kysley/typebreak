@@ -1,9 +1,11 @@
 import { RefObject, useLayoutEffect, useMemo } from 'react';
 import { animated, useSpring, easings } from 'react-spring';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { currentLetterAtom, eolAtom, WordState } from '../state';
+import { currentLetterAtom, eolAtom } from '../state';
+import { AllSlices, useStore, WordState } from '../state/words-slice';
 import { styled } from '../stitches.conf';
 
+const selector = (state: AllSlices) => ({dispatch: state.dispatch, curLetter: state.wordsState[state.index].input.length})
 export const Caret = ({
   index,
   words,
@@ -17,8 +19,9 @@ export const Caret = ({
   secondLineTop: number;
   line: 1 | 2;
 }) => {
-  const curLetter = useRecoilValue(currentLetterAtom);
-  const setEol = useSetRecoilState(eolAtom);
+  // const curLetter = useRecoilValue(currentLetterAtom);
+  // const setEol = useSetRecoilState(eolAtom);
+  const {dispatch, curLetter} = useStore(selector)
   const [caretPos, setCaretPos] = useSpring(() => ({
     transform: 'translate(0,0)',
     config: {
@@ -53,7 +56,7 @@ export const Caret = ({
     let dir: 'left' | 'right';
     let letter;
     let isExtraLetter = false;
-    if (curLetter >= words[index].name.length) {
+    if (curLetter >= words[index].word.length) {
       letter = letters[curLetter - 1];
       dir = 'right';
       isExtraLetter = true;
@@ -67,7 +70,7 @@ export const Caret = ({
       letterBounding['right'] + horizontalSpaceBetweenWords * 2 >
         containerBounding.right;
 
-    setEol(isEol);
+    dispatch({endOfLine: isEol});
 
     setCaretPos({
       transform: `translate(${
@@ -81,7 +84,6 @@ export const Caret = ({
     setCaretPos,
     words,
     wordsRef,
-    setEol,
     line,
     secondLineTop,
   ]);

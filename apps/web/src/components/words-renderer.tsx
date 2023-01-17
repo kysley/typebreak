@@ -2,14 +2,17 @@ import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useRefocus } from '../hooks/use-refocus';
 import { focusedAtom, indexAtom, wordsAtom } from '../state';
+import { AllSlices, createGameSlice, useStore } from '../state/words-slice';
 import { Caret } from './caret';
 import { HiddenInput } from './hidden-input';
 import { Word } from './word';
 
+const selector = (state: AllSlices) => ({index: state.index, words: state.wordsState})
 export const WordsRenderer = memo(() => {
-  const words = useRecoilValue(wordsAtom);
+  // const words = useRecoilValue(wordsAtom);
+  const {index,words} = useStore(selector)
   const inputRef = useRef<HTMLInputElement>(null);
-  const index = useRecoilValue(indexAtom);
+  // const index = useRecoilValue(indexAtom);
   const wordsRef = useRef<HTMLDivElement>(null);
 
   const focusTrigger = useRecoilValue(focusedAtom);
@@ -79,7 +82,7 @@ export const WordsRenderer = memo(() => {
             <div ref={wordsRef} id='dev' onClick={() => refocus()}>
               {words.map((word, idx) => (
                 <Word
-                  myIndex={idx}
+                  word={word}
                   key={`${word.id}-${idx}`}
                   show={idx <= index}
                   hidden={timesBroken >= 2 && idx < hideUnder}
